@@ -10,21 +10,23 @@ public interface LivroInterface {
 
     public void delLivro(int isbn);
 
-    public void altTitulo(String titulo);
+    public List<Livro> getLivros();
 
-    public void altAltor(String autor);
+    public List<Livro> buscarTitulo(String titulo);
 
-    public void altPreco(double preco);
-
-    public void altEstoque(int estoque);
-
-    public void altIsbn(int isbn);
-
-    public void altLancamento(LocalDate data);
-
-    public List<Livro> buscarLivro(String titulo);
-
-    public List<Livro> buscarLivro(int isbn);
+    public Livro buscarISBN(int isbn);
 
     public List<Livro> buscarAutor(String autor);
+
+    public List<Livro> buscarPreco(double preco);
+
+    public void altTitulo(int isbn, String novoTitulo);
+
+    public void altAutor(int isbn, String novoAutor);
+
+    public void altPreco(int isbn, double novoPreco);
+
+    public void altEstoque(int isbn, int novoEstoque);
+
+    public void altISBN(int isbn, int novaISBN);
 }
