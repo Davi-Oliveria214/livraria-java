@@ -1,4 +1,4 @@
-package gerenciamento;
+package controller;
 
 import excecoes.BuscaLivros;
 import excecoes.ExcecoesLivro;
@@ -34,9 +34,7 @@ public class LivroControle implements LivroInterface {
 
     @Override
     public void delLivro(int isbn) throws ExcecoesLivro {
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         boolean remover = listaLivros.removeIf(livro -> livro.getIsbn() == isbn);
 
@@ -54,9 +52,7 @@ public class LivroControle implements LivroInterface {
     public List<Livro> buscarTitulo(String titulo) throws ExcecoesLivro {
         List<Livro> livros = new ArrayList<>();
 
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         for (Livro livro : listaLivros) {
             if (livro.getTitulo().equals(titulo)) {
@@ -75,9 +71,7 @@ public class LivroControle implements LivroInterface {
     public Livro buscarISBN(int isbn) throws ExcecoesLivro {
         Livro livro = null;
 
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+       this.verificar();
 
         for (Livro livros : listaLivros) {
             if (livros.getIsbn() == isbn) {
@@ -96,9 +90,7 @@ public class LivroControle implements LivroInterface {
     public List<Livro> buscarAutor(String autor) throws ExcecoesLivro {
         List<Livro> livroAutor = new ArrayList<>();
 
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         for (Livro livro : listaLivros) {
             if (livro.getAutor().equals(autor)) {
@@ -117,9 +109,7 @@ public class LivroControle implements LivroInterface {
     public List<Livro> buscarPreco(double preco) {
         List<Livro> livros = new ArrayList<>();
 
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         for (Livro livro : listaLivros) {
             if (livro.getPreco() == preco) {
@@ -136,46 +126,42 @@ public class LivroControle implements LivroInterface {
 
     @Override
     public void altTitulo(int isbn, String novoTitulo) throws ExcecoesLivro {
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         this.buscarISBN(isbn).setTitulo(novoTitulo);
     }
 
     @Override
     public void altAutor(int isbn, String novoAutor) {
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         this.buscarISBN(isbn).setAutor(novoAutor);
     }
 
     @Override
     public void altPreco(int isbn, double novoPreco) {
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         this.buscarISBN(isbn).setPreco(novoPreco);
     }
 
     @Override
     public void altEstoque(int isbn, int novoEstoque) {
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         this.buscarISBN(isbn).setEstoque(novoEstoque);
     }
 
     @Override
     public void altISBN(int isbn, int novaISBN) {
-        if (listaLivros.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
-        }
+        this.verificar();
 
         this.buscarISBN(isbn).setIsbn(novaISBN);
+    }
+
+    public void verificar(){
+        if(listaLivros.isEmpty()){
+            throw new BuscaLivros("Nenhum livro cadastrado");
+        }
     }
 }
