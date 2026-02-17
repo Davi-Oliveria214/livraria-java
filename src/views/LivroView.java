@@ -1,22 +1,23 @@
 package views;
 
-import controller.LivroControle;
+import controller.LivroController;
 import excecoes.ExcecoesLivro;
 import livro.Livro;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class LivroView {
-    private LivroControle livroControle;
+    private final LivroController livroControle;
+    private final Scanner sc;
+    private final DateTimeFormatter formato;
     private Livro livro;
-    private Scanner sc;
-    private DateTimeFormatter formato;
 
     public LivroView() {
-        this.livroControle = new LivroControle();
+        this.livroControle = new LivroController();
         this.sc = new Scanner(System.in);
         this.formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
@@ -26,9 +27,10 @@ public class LivroView {
 
         do {
             try {
-                System.out.println("Escolha uma das opções \n 1-Adicionar livro \n 2-Remover livro \n 3-Buscar livro \n 4-Alterar livro \n 0-Siar");
+                System.out.println("Escolha uma das opções \n 1-Adicionar livro \n 2-Remover livro \n 3-Buscar livro \n 4-Alterar livro \n 5-Ver todos os livros \n 0-Sair");
                 opcao = sc.nextInt();
 
+                sc.nextLine();
                 switch (opcao) {
                     case 1:
                         this.addLivro();
@@ -44,6 +46,9 @@ public class LivroView {
                     case 4:
                         livroControle.verificar();
                         this.altLivro();
+                        break;
+                    case 5:
+                        this.todosLivros();
                         break;
                     case 0:
                         System.out.println("Fechando sistema");
@@ -65,24 +70,24 @@ public class LivroView {
             System.out.println("==Adicionando um novo livro==");
 
             System.out.println("Digite o titulo do livro");
-            String titulo = sc.next();
+            String titulo = sc.nextLine();
 
             System.out.println("Digite o autor do livro");
-            String autor = sc.next();
+            String autor = sc.nextLine();
 
             System.out.println("Digite a ISBN do livro");
             int isbn = sc.nextInt();
-            livroControle.buscarISBN(isbn);
 
+            sc.nextLine();
             System.out.println("Digite o preço do livro");
             double preco = sc.nextDouble();
 
             System.out.println("Digite a quantidade em estoque do livro");
             int estoque = sc.nextInt();
 
+            sc.nextLine();
             System.out.println("Digite a data de lançamento do livro (dia/mês/ano)");
-            String lancamento = sc.next();
-
+            String lancamento = sc.nextLine();
             LocalDate data = LocalDate.parse(lancamento, formato);
 
             livroControle.addLivro(titulo, autor, preco, isbn, estoque, data);
@@ -91,6 +96,8 @@ public class LivroView {
         } catch (InputMismatchException in) {
             sc.next();
             System.out.println("Digite apenas números na ISBN, preço e estoque");
+        } catch (DateTimeException date) {
+            System.out.println("Formato de data incorreto");
         }
     }
 
@@ -104,11 +111,12 @@ public class LivroView {
             livro = livroControle.buscarISBN(isbn);
 
             if (livro != null) {
+                sc.nextLine();
                 System.out.println("Deseja deletar o livro: " + livro.toString() + "\n 1-Sim \n 2-Não");
                 opcao = sc.nextInt();
             }
 
-            if (opcao == 2) {
+            if (opcao == 1) {
                 livroControle.delLivro(isbn);
                 System.out.println("Livro deletado com sucesso!!!");
             }
@@ -128,16 +136,17 @@ public class LivroView {
                 System.out.println("Escolha a maneira que deseja procura o livro \n 1-Titulo \n 2-Autor \n 3-ISBN \n 4-Preço \n 0-Menu");
                 opcao = sc.nextInt();
 
+                sc.nextLine();
                 switch (opcao) {
                     case 1:
                         System.out.println("Digite o titulo do livro");
-                        String titulo = sc.next();
+                        String titulo = sc.nextLine();
 
                         System.out.println(livroControle.buscarTitulo(titulo).toString());
                         break;
                     case 2:
                         System.out.println("Digite o nome do autor que deseja encontrar");
-                        String autor = sc.next();
+                        String autor = sc.nextLine();
 
                         System.out.println(livroControle.buscarAutor(autor).toString());
                         break;
@@ -180,20 +189,22 @@ public class LivroView {
 
                 System.out.println("\n" + livro.toString() + "\n");
 
+                sc.nextLine();
                 System.out.println("Escolha o que deseja alterar do livro \n 1-Titulo \n 2-Autor \n 3-Preço \n 4-Estoque \n 5-ISBN \n 0-Menu principal");
                 opcao = sc.nextInt();
 
+                sc.nextLine();
                 switch (opcao) {
                     case 1:
                         System.out.println("Digite o novo titulo");
-                        String titulo = sc.next();
+                        String titulo = sc.nextLine();
 
                         livroControle.altTitulo(isbn, titulo);
                         System.out.println("Titulo alterado com sucesso");
                         break;
                     case 2:
                         System.out.println("Digite o novo autor");
-                        String autor = sc.next();
+                        String autor = sc.nextLine();
 
                         livroControle.altAutor(isbn, autor);
                         System.out.println("Autor alterado com sucesso");
@@ -227,6 +238,9 @@ public class LivroView {
                 }
 
                 System.out.println("Novas informações: " + livro.toString());
+
+                System.out.println("Deseja fazer alguma outra alteração?");
+                opcao = sc.nextInt();
             } catch (ExcecoesLivro e) {
                 System.out.println(e.getMessage());
             } catch (InputMismatchException in) {
@@ -234,5 +248,13 @@ public class LivroView {
                 System.out.println("Digite apenas números");
             }
         } while (opcao != 0);
+    }
+
+    private void todosLivros() {
+        try {
+            System.out.println(livroControle.getLivros().toString());
+        } catch (ExcecoesLivro e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

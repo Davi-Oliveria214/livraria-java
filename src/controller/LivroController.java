@@ -3,16 +3,17 @@ package controller;
 import excecoes.BuscaLivros;
 import excecoes.ExcecoesLivro;
 import livro.Livro;
+import services.LivroInterface;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LivroControle implements LivroInterface {
+public class LivroController implements LivroInterface {
     private final List<Livro> listaLivros;
     private Long id = 1L;
 
-    public LivroControle() {
+    public LivroController() {
         listaLivros = new ArrayList<>();
     }
 
@@ -45,6 +46,7 @@ public class LivroControle implements LivroInterface {
 
     @Override
     public List<Livro> getLivros() {
+        this.verificar();
         return listaLivros;
     }
 
@@ -80,7 +82,7 @@ public class LivroControle implements LivroInterface {
         }
 
         if (livro == null) {
-            throw new BuscaLivros("Nenhum livro a ISBN: " + isbn + ", encontrado");
+            throw new BuscaLivros("Nenhum livro com a ISBN: " + isbn + ", encontrado");
         }
 
         return livro;
