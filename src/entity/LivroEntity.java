@@ -1,8 +1,8 @@
-package livro;
+package entity;
 
 import java.time.LocalDate;
 
-public class Livro {
+public class LivroEntity {
     private final Long id;
     private String titulo;
     private String autor;
@@ -11,7 +11,7 @@ public class Livro {
     private int estoque;
     private LocalDate lancamento;
 
-    public Livro(Long id, String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
+    public LivroEntity(Long id, String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;

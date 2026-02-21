@@ -9,11 +9,11 @@ futuras, será integrado a um banco de dados.
 
 ## 🚀 Funcionalidades
 
-- Adicionar livros
-- Remover livros
+- Adicionar livroEntities
+- Remover livroEntities
 - Alterar informações (título, autor, preço, estoque, ISBN)
-- Buscar livros
-- Listar todos os livros cadastrados
+- Buscar livroEntities
+- Listar todos os livroEntities cadastrados
 
 ---
 
@@ -21,7 +21,7 @@ futuras, será integrado a um banco de dados.
 
 O projeto está dividido em **5 pacotes principais**:
 
-### 1. `livro`
+### 1. `entity`
 
 Contém a classe **Livro**, que define os atributos básicos:
 
@@ -59,7 +59,7 @@ Contém a classe **LivroController**, que implementa a `LivroInterface` e define
 
 ---
 
-### 4. `views`
+### 4. `cli`
 
 Contém a classe **LivroView**, responsável pela interação com o usuário.  
 Atualmente funciona com `System.out.println()` e `Scanner`, mas será migrada para **Java Swing** em versões futuras.

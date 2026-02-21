@@ -1,8 +1,8 @@
-package views;
+package cli;
 
 import controller.LivroController;
+import entity.LivroEntity;
 import excecoes.ExcecoesLivro;
-import livro.Livro;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -10,14 +10,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class LivroView {
+public class LivroCLI {
     private final LivroController livroControle;
     private final Scanner sc;
     private final DateTimeFormatter formato;
-    private Livro livro;
+    private LivroEntity livroEntity;
 
-    public LivroView() {
-        this.livroControle = new LivroController();
+    public LivroCLI(LivroController livroController) {
+        this.livroControle = livroController;
         this.sc = new Scanner(System.in);
         this.formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
@@ -36,15 +36,15 @@ public class LivroView {
                         this.addLivro();
                         break;
                     case 2:
-                        livroControle.verificar();
+
                         this.delLivro();
                         break;
                     case 3:
-                        livroControle.verificar();
+
                         this.buscarLivro();
                         break;
                     case 4:
-                        livroControle.verificar();
+
                         this.altLivro();
                         break;
                     case 5:
@@ -90,7 +90,7 @@ public class LivroView {
             String lancamento = sc.nextLine();
             LocalDate data = LocalDate.parse(lancamento, formato);
 
-            livroControle.addLivro(titulo, autor, preco, isbn, estoque, data);
+
         } catch (ExcecoesLivro e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException in) {
@@ -108,16 +108,16 @@ public class LivroView {
             System.out.println("Digite a ISBN do livro");
             int isbn = sc.nextInt();
 
-            livro = livroControle.buscarISBN(isbn);
 
-            if (livro != null) {
+
+            if (livroEntity != null) {
                 sc.nextLine();
-                System.out.println("Deseja deletar o livro: " + livro.toString() + "\n 1-Sim \n 2-Não");
+                System.out.println("Deseja deletar o livro: " + livroEntity.toString() + "\n 1-Sim \n 2-Não");
                 opcao = sc.nextInt();
             }
 
             if (opcao == 1) {
-                livroControle.delLivro(isbn);
+
                 System.out.println("Livro deletado com sucesso!!!");
             }
         } catch (ExcecoesLivro e) {
@@ -142,25 +142,25 @@ public class LivroView {
                         System.out.println("Digite o titulo do livro");
                         String titulo = sc.nextLine();
 
-                        System.out.println(livroControle.buscarTitulo(titulo).toString());
+
                         break;
                     case 2:
                         System.out.println("Digite o nome do autor que deseja encontrar");
                         String autor = sc.nextLine();
 
-                        System.out.println(livroControle.buscarAutor(autor).toString());
+
                         break;
                     case 3:
                         System.out.println("Digite a ISBN do livro que deseja encontrar");
                         int isbn = sc.nextInt();
 
-                        System.out.println(livroControle.buscarISBN(isbn).toString());
+
                         break;
                     case 4:
                         System.out.println("Digite o preço que deseja encontrar");
                         double preco = sc.nextDouble();
 
-                        System.out.println(livroControle.buscarPreco(preco).toString());
+
                         break;
                     case 0:
                         System.out.println("Voltando ao menu inicial");
@@ -185,9 +185,9 @@ public class LivroView {
                 System.out.println("Digite a ISBN do livro que deseja alterar");
                 int isbn = sc.nextInt();
 
-                livro = livroControle.buscarISBN(isbn);
 
-                System.out.println("\n" + livro.toString() + "\n");
+
+                System.out.println("\n" + livroEntity.toString() + "\n");
 
                 sc.nextLine();
                 System.out.println("Escolha o que deseja alterar do livro \n 1-Titulo \n 2-Autor \n 3-Preço \n 4-Estoque \n 5-ISBN \n 0-Menu principal");
@@ -199,35 +199,35 @@ public class LivroView {
                         System.out.println("Digite o novo titulo");
                         String titulo = sc.nextLine();
 
-                        livroControle.altTitulo(isbn, titulo);
+
                         System.out.println("Titulo alterado com sucesso");
                         break;
                     case 2:
                         System.out.println("Digite o novo autor");
                         String autor = sc.nextLine();
 
-                        livroControle.altAutor(isbn, autor);
+
                         System.out.println("Autor alterado com sucesso");
                         break;
                     case 3:
                         System.out.println("Digite o novo preço");
                         double preco = sc.nextDouble();
 
-                        livroControle.altPreco(isbn, preco);
+
                         System.out.println("Preço alterado com sucesso");
                         break;
                     case 4:
                         System.out.println("Digite o novo Estoque");
                         int estoque = sc.nextInt();
 
-                        livroControle.altEstoque(isbn, estoque);
+
                         System.out.println("Estoque alterado com sucesso");
                         break;
                     case 5:
                         System.out.println("Digite a nova ISBN");
                         int isbnNova = sc.nextInt();
 
-                        livroControle.altISBN(isbn, isbnNova);
+
                         System.out.println("ISBN alterado com sucesso");
                         break;
                     case 0:
@@ -237,7 +237,7 @@ public class LivroView {
                         System.out.println("Nenhuma opção encontrada");
                 }
 
-                System.out.println("Novas informações: " + livro.toString());
+                System.out.println("Novas informações: " + livroEntity.toString());
 
                 System.out.println("Deseja fazer alguma outra alteração?");
                 opcao = sc.nextInt();
@@ -252,7 +252,7 @@ public class LivroView {
 
     private void todosLivros() {
         try {
-            System.out.println(livroControle.getLivros().toString());
+
         } catch (ExcecoesLivro e) {
             System.out.println(e.getMessage());
         }

@@ -1,8 +1,12 @@
-import views.LivroView;
+import cli.LivroCLI;
+import controller.LivroController;
+import repository.LivroRepository;
+import services.LivroService;
 
 public class Main {
     public static void main(String[] args) {
-        LivroView view = new LivroView();
+        LivroController livroController = new LivroController(new LivroService(new LivroRepository()));
+        LivroCLI view = new LivroCLI(livroController);
 
         view.start();
     }
