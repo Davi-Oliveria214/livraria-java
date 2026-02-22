@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LivroController {
-    private LivroService service;
+    private final LivroService service;
     private Long id = 1L;
 
     public LivroController(LivroService livroService) {

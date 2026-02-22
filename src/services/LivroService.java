@@ -8,7 +8,7 @@ import repository.LivroRepository;
 import java.util.List;
 
 public class LivroService implements LivroInterface {
-    private LivroRepository repository;
+    private final LivroRepository repository;
 
     public LivroService(LivroRepository livroRepository) {
         repository = livroRepository;
