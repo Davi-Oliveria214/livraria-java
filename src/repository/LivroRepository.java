@@ -1,5 +1,6 @@
 package repository;
 
+import connection.LivroConnection;
 import entity.LivroEntity;
 
 import java.util.ArrayList;
@@ -8,9 +9,11 @@ import java.util.Objects;
 
 public class LivroRepository {
     private final List<LivroEntity> listaLivroEntities;
+    private final LivroConnection conn;
 
-    public LivroRepository() {
+    public LivroRepository(LivroConnection livroConnection) {
         this.listaLivroEntities = new ArrayList<>();
+        this.conn = livroConnection;
     }
 
     public void newLivro(LivroEntity livroEntity) {

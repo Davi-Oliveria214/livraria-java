@@ -3,6 +3,8 @@ out/
 .kotlin
 .idea/
 *.iml
+.env
+target/
 
 ### Eclipse ###
 .apt_generated

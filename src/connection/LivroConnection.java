@@ -1,21 +1,32 @@
 package connection;
 
-import java.lang.reflect.InvocationTargetException;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class LivroConnection {
-    private static Connection conn;
+    private Connection conn;
 
-    private static final String URL = "jdbc:mysql://localhost:3307/bd_livraria";
-    private static final String USER = "";
-    private static final String password = "";
+    private final String URL;
+    private final String USER;
+    private final String PASSWORD;
 
-    public static Connection con() {
+    public LivroConnection() {
+        Dotenv dotEnv = Dotenv.load();
+
+        this.URL = dotEnv.get("DB_URL");
+        this.USER = dotEnv.get("DB_USER");
+        this.PASSWORD = dotEnv.get("DB_PASSWORD");
+    }
+
+    public Connection connection() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver").getDeclaredConstructor().newInstance();
+            if (conn == null || conn.isClosed()) {
+                conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            }
 
-            conn = DriverManager.getConnection(URL, "", "");
+            System.out.println("Conexão feita com sucesso!!!!");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
