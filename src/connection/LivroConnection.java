@@ -25,8 +25,6 @@ public class LivroConnection {
             if (conn == null || conn.isClosed()) {
                 conn = DriverManager.getConnection(URL, USER, PASSWORD);
             }
-
-            System.out.println("Conexão feita com sucesso!!!!");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
