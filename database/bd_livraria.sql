@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS bd_livraria;
+
 CREATE DATABASE bd_livraria;
 
 USE bd_livraria;
@@ -11,3 +13,5 @@ CREATE TABLE livro (
     estoque INTEGER NOT NULL,
     lancamento DATE NOT NULL
 );
+
+SELECT * FROM livro;

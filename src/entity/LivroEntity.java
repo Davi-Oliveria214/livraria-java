@@ -1,9 +1,10 @@
 package entity;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 public class LivroEntity {
-    private final Long id;
+    private int id;
     private String titulo;
     private String autor;
     private double preco;
@@ -11,7 +12,16 @@ public class LivroEntity {
     private int estoque;
     private LocalDate lancamento;
 
-    public LivroEntity(Long id, String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
+    public LivroEntity(String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.preco = preco;
+        this.isbn = isbn;
+        this.estoque = estoque;
+        this.lancamento = lancamento;
+    }
+
+    public LivroEntity(int id, String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
@@ -21,7 +31,7 @@ public class LivroEntity {
         this.lancamento = lancamento;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
@@ -76,6 +86,7 @@ public class LivroEntity {
     @Override
     public String toString() {
         return "Livro{" +
+                "ID: " + id +
                 ", Titulo='" + titulo + '\'' +
                 ", Autor='" + autor + '\'' +
                 ", Preço=" + preco +

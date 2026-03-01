@@ -9,7 +9,7 @@ import java.util.List;
 
 public class LivroController {
     private final LivroService service;
-    private Long id = 1L;
+    private int id = 1;
 
     public LivroController(LivroService livroService) {
         this.service = livroService;

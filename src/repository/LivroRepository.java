@@ -7,17 +7,12 @@ import excecoes.ExcecoesLivro;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class LivroRepository {
-    private final List<LivroEntity> listaLivroEntities;
     private final LivroConnection conn;
-
-    private Statement stm;
     private ResultSet res;
 
     public LivroRepository(LivroConnection livroConnection) {
-        this.listaLivroEntities = new ArrayList<>();
         this.conn = livroConnection;
     }
 
@@ -25,7 +20,6 @@ public class LivroRepository {
         String sql = "INSERT INTO livro(titulo, autor, isbn, preco, estoque, lancamento) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-
             stm.setString(1, livro.getTitulo());
             stm.setString(2, livro.getAutor());
             stm.setInt(3, livro.getIsbn());
@@ -35,69 +29,129 @@ public class LivroRepository {
 
             stm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ExcecoesLivro("Erro ao adicionar livro", e);
         }
     }
 
-    public void delLivro(LivroEntity livroEntity) {
-        listaLivroEntities.remove(livroEntity);
+    public void delLivro(LivroEntity livro) {
+        String sql = "DELETE FROM livro WHERE id = ?";
+
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            stm.setInt(1, livro.getId());
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao apagar livro", e);
+        }
     }
 
-    public void updateLivro(LivroEntity livroEntity) {
-        for (int i = 0; i < listaLivroEntities.size(); i++) {
-            if (Objects.equals(listaLivroEntities.get(i).getId(), livroEntity.getId())) {
-                listaLivroEntities.set(i, livroEntity);
-            }
+    public void updateLivro(LivroEntity livro) {
+        String sql = "UPDATE livro SET titulo = ?, autor = ?, isbn = ?, preco = ?, estoque = ?, lancamento = ? WHERE id = ?";
+
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            stm.setString(1, livro.getTitulo());
+            stm.setString(2, livro.getAutor());
+            stm.setInt(3, livro.getIsbn());
+            stm.setDouble(4, livro.getPreco());
+            stm.setInt(5, livro.getEstoque());
+            stm.setDate(6, Date.valueOf(livro.getLancamento()));
+            stm.setInt(7, livro.getId());
+
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao atualizar o livro", e);
         }
     }
 
     public List<LivroEntity> buscarTitulo(String titulo) {
-        List<LivroEntity> livroEntities = new ArrayList<>();
+        List<LivroEntity> livros = new ArrayList<>();
+        String sql = "SELECT * FROM livro WHERE titulo = ?";
 
-        for (LivroEntity livroEntity : listaLivroEntities) {
-            if (livroEntity.getTitulo().equals(titulo)) {
-                livroEntities.add(livroEntity);
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            stm.setString(1, titulo);
+            res = stm.executeQuery();
+
+            while (res.next()) {
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                livros.add(livro);
             }
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao buscar titulo", e);
         }
 
-        return livroEntities;
+        return livros;
     }
 
     public List<LivroEntity> buscarAutor(String autor) {
-        List<LivroEntity> livroEntities = new ArrayList<>();
+        List<LivroEntity> livros = new ArrayList<>();
+        String sql = "SELECT * FROM livro WHERE autor = ?";
 
-        for (LivroEntity livroEntity : listaLivroEntities) {
-            if (livroEntity.getAutor().equals(autor)) {
-                livroEntities.add(livroEntity);
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            stm.setString(1, autor);
+            res = stm.executeQuery();
+
+            while (res.next()) {
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                livros.add(livro);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        return livroEntities;
+        return livros;
     }
 
     public LivroEntity buscarISBN(int isbn) {
-        for (LivroEntity livroEntity : listaLivroEntities) {
-            if (livroEntity.getIsbn() == isbn) {
-                return livroEntity;
+        LivroEntity livro = null;
+        String sql = "SELECT * FROM livro WHERE isbn = ?";
+
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            stm.setInt(1, isbn);
+            res = stm.executeQuery();
+
+            if (res.next()) {
+                livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
             }
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao buscar ISBN", e);
         }
 
-        return null;
+        return livro;
     }
 
     public List<LivroEntity> buscarPreco(double preco) {
-        List<LivroEntity> livroEntities = new ArrayList<>();
+        List<LivroEntity> livros = new ArrayList<>();
+        String sql = "SELECT * FROM livro WHERE preco = ?";
 
-        for (LivroEntity livroEntity : listaLivroEntities) {
-            if (livroEntity.getPreco() == preco) {
-                livroEntities.add(livroEntity);
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            stm.setDouble(1, preco);
+            res = stm.executeQuery();
+
+            while (res.next()) {
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                livros.add(livro);
             }
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao buscar livro por preço", e);
         }
 
-        return livroEntities;
+        return livros;
     }
 
     public List<LivroEntity> todosLivros() {
-        return listaLivroEntities;
+        List<LivroEntity> livros = new ArrayList<>();
+        String sql = "SELECT * FROM livro";
+
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            res = stm.executeQuery();
+
+            while (res.next()) {
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                livros.add(livro);
+            }
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao buscar livros", e);
+        }
+
+        return livros;
     }
 }
