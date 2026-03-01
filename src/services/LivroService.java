@@ -151,7 +151,7 @@ public class LivroService implements LivroInterface {
     }
 
     public void verificar() throws ExcecoesLivro {
-        if (repository.todosLivros().isEmpty()) {
+        if (repository.isTabelaVazia()) {
             throw new BuscaLivros("Nenhum livro cadastrado");
         }
     }
