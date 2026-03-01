@@ -94,7 +94,7 @@ public class LivroRepository {
                 livros.add(livro);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ExcecoesLivro("Erro ao buscar autor", e);
         }
 
         return livros;
@@ -153,5 +153,21 @@ public class LivroRepository {
         }
 
         return livros;
+    }
+
+    public boolean isTabelaVazia() {
+        String sql = "SELECT EXISTS (SELECT 1 FROM livro)";
+
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            res = stm.executeQuery();
+
+            if (res.next()) {
+                return !res.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao buscar livros", e);
+        }
+
+        return true;
     }
 }

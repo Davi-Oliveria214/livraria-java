@@ -14,4 +14,6 @@ CREATE TABLE livro (
     lancamento DATE NOT NULL
 );
 
+INSERT INTO livro(titulo, autor, isbn, preco, estoque, lancamento) VALUES ('Teste',  'Teste',  2098, '20.5', 200, '2008-08-20'); 
+
 SELECT * FROM livro;
