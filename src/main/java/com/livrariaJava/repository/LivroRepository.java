@@ -103,22 +103,23 @@ public class LivroRepository {
         return livros;
     }
 
-    public Livro buscarISBN(int isbn) {
-        Livro livro = null;
-        String sql = "SELECT * FROM livro WHERE isbn = ?";
+    public List<Livro> buscarISBN(int isbn) {
+        List<Livro> livros = new ArrayList<>();
+        String sql = "SELECT * FROM livro WHERE isbn LIKE CONCAT('%', ?, '%')";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setInt(1, isbn);
             res = stm.executeQuery();
 
-            if (res.next()) {
-                livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+            while (res.next()) {
+                Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                livros.add(livro);
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar ISBN", e);
         }
 
-        return livro;
+        return livros;
     }
 
     public Livro buscarId(int id) {

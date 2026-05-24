@@ -64,16 +64,21 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro buscarISBN(int isbn) throws ExcecoesLivro {
+    public List<Livro> buscarISBN(int isbn) throws ExcecoesLivro {
         this.verificar();
 
-        Livro livro = repository.buscarISBN(isbn);
+        List<Livro> livros = repository.buscarISBN(isbn);
 
-        if (livro == null) {
+        if (livros == null) {
             throw new BuscaLivros("Nenhum livro com a ISBN: " + isbn + ", encontrado");
         }
 
-        return livro;
+        return livros;
+    }
+
+    @Override
+    public Livro buscarId(int id) {
+        return repository.buscarId(id);
     }
 
     @Override
@@ -103,50 +108,50 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public void altTitulo(int isbn, String novoTitulo) throws ExcecoesLivro {
+    public void altTitulo(int id, String novoTitulo) throws ExcecoesLivro {
         this.verificar();
 
-        Livro livro = this.buscarISBN(isbn);
+        Livro livro = this.buscarId(id);
         livro.setTitulo(novoTitulo);
 
         this.repository.updateLivro(livro);
     }
 
     @Override
-    public void altAutor(int isbn, String novoAutor) throws ExcecoesLivro {
+    public void altAutor(int id, String novoAutor) throws ExcecoesLivro {
         this.verificar();
 
-        Livro livro = this.buscarISBN(isbn);
+        Livro livro = this.buscarId(id);
         livro.setAutor(novoAutor);
 
         this.repository.updateLivro(livro);
     }
 
     @Override
-    public void altPreco(int isbn, double novoPreco) throws ExcecoesLivro {
+    public void altPreco(int id, double novoPreco) throws ExcecoesLivro {
         this.verificar();
 
-        Livro livro = this.buscarISBN(isbn);
+        Livro livro = this.buscarId(id);
         livro.setPreco(novoPreco);
 
         repository.updateLivro(livro);
     }
 
     @Override
-    public void altEstoque(int isbn, int novoEstoque) throws ExcecoesLivro {
+    public void altEstoque(int id, int novoEstoque) throws ExcecoesLivro {
         this.verificar();
 
-        Livro livro = this.buscarISBN(isbn);
+        Livro livro = this.buscarId(id);
         livro.setEstoque(novoEstoque);
 
         this.repository.updateLivro(livro);
     }
 
     @Override
-    public void altISBN(int isbn, int novaISBN) throws ExcecoesLivro {
+    public void altISBN(int id, int novaISBN) throws ExcecoesLivro {
         this.verificar();
 
-        Livro livro = this.buscarISBN(isbn);
+        Livro livro = this.buscarId(id);
         livro.setIsbn(novaISBN);
 
         this.repository.updateLivro(livro);

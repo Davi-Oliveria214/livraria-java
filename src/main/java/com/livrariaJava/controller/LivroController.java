@@ -31,13 +31,18 @@ public class LivroController {
         return this.service.getLivros();
     }
 
-    @GetMapping("/{titulo}")
+    @GetMapping("/{id}")
+    public Livro buscarId(@PathVariable("id") int id) {
+        return this.service.buscarId(id);
+    }
+
+    @GetMapping("/titulo/{titulo}")
     public List<Livro> buscarTitulo(@PathVariable("titulo") String titulo) throws ExcecoesLivro {
         return this.service.buscarTitulo(titulo);
     }
 
     @GetMapping("/isbn/{isbn}")
-    public Livro buscarISBN(@PathVariable("isbn") int isbn) throws ExcecoesLivro {
+    public List<Livro> buscarISBN(@PathVariable("isbn") int isbn) throws ExcecoesLivro {
         return this.service.buscarISBN(isbn);
     }
 
