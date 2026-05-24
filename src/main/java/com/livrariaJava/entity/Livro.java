@@ -1,18 +1,21 @@
 package com.livrariaJava.entity;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-public class LivroEntity {
+public class Livro {
     private int id;
     private String titulo;
     private String autor;
     private double preco;
     private int isbn;
     private int estoque;
-    private Date lancamento;
+    private LocalDate lancamento;
 
-    public LivroEntity(String titulo, String autor, double preco, int isbn, int estoque, Date lancamento) {
+    public Livro() {
+
+    }
+
+    public Livro(String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
         this.titulo = titulo;
         this.autor = autor;
         this.preco = preco;
@@ -21,7 +24,7 @@ public class LivroEntity {
         this.lancamento = lancamento;
     }
 
-    public LivroEntity(int id, String titulo, String autor, double preco, int isbn, int estoque, Date lancamento) {
+    public Livro(int id, String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
@@ -75,11 +78,11 @@ public class LivroEntity {
         this.estoque = estoque;
     }
 
-    public Date getLancamento() {
+    public LocalDate getLancamento() {
         return lancamento;
     }
 
-    public void setLancamento(Date lancamento) {
+    public void setLancamento(LocalDate lancamento) {
         this.lancamento = lancamento;
     }
 

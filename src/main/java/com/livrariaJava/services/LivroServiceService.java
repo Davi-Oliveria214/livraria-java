@@ -1,9 +1,9 @@
 package com.livrariaJava.services;
 
-import com.livrariaJava.entity.LivroEntity;
+import com.livrariaJava.entity.Livro;
 import com.livrariaJava.excecoes.BuscaLivros;
 import com.livrariaJava.excecoes.ExcecoesLivro;
-import com.livrariaJava.interfaces.LivroInterface;
+import com.livrariaJava.interfaces.LivroServiceInterface;
 import com.livrariaJava.repository.LivroRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,21 +11,21 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class LivroService implements LivroInterface {
+public class LivroServiceService implements LivroServiceInterface {
     private final LivroRepository repository;
 
-    public LivroService(LivroRepository livroRepository) {
+    public LivroServiceService(LivroRepository livroRepository) {
         repository = livroRepository;
     }
 
     @Override
-    public void criarLivro(LivroEntity livro) {
+    public void criarLivro(Livro livro) {
 
         if (repository.buscarISBN(livro.getIsbn()) != null) {
             throw new BuscaLivros("Essa ISBN já está cadastrada");
         }
 
-        for (LivroEntity livros : repository.buscarTitulo(livro.getTitulo())) {
+        for (Livro livros : repository.buscarTitulo(livro.getTitulo())) {
             if (Objects.equals(livros.getTitulo(), livro.getTitulo()) && Objects.equals(livros.getAutor(), livro.getAutor())) {
                 throw new BuscaLivros("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
             }
@@ -35,26 +35,26 @@ public class LivroService implements LivroInterface {
     }
 
     @Override
-    public void delLivro(int isbn) throws ExcecoesLivro {
-        LivroEntity livroEntity = repository.buscarISBN(isbn);
+    public void delLivro(int id) throws ExcecoesLivro {
+        Livro livro = repository.buscarId(id);
 
-        if (livroEntity == null) {
+        if (livro == null) {
             throw new BuscaLivros("Nenhum livro encontrado");
         }
 
-        repository.delLivro(livroEntity);
+        repository.delLivro(livro);
     }
 
     @Override
-    public List<LivroEntity> getLivros() {
+    public List<Livro> getLivros() {
         return repository.todosLivros();
     }
 
     @Override
-    public List<LivroEntity> buscarTitulo(String titulo) throws ExcecoesLivro {
+    public List<Livro> buscarTitulo(String titulo) throws ExcecoesLivro {
         this.verificar();
 
-        List<LivroEntity> livroEntities = repository.buscarTitulo(titulo);
+        List<Livro> livroEntities = repository.buscarTitulo(titulo);
 
         if (livroEntities.isEmpty()) {
             throw new BuscaLivros("Nenhum livro com o titulo: " + titulo + ", encontrado");
@@ -64,36 +64,36 @@ public class LivroService implements LivroInterface {
     }
 
     @Override
-    public LivroEntity buscarISBN(int isbn) throws ExcecoesLivro {
+    public Livro buscarISBN(int isbn) throws ExcecoesLivro {
         this.verificar();
 
-        LivroEntity livroEntity = repository.buscarISBN(isbn);
+        Livro livro = repository.buscarISBN(isbn);
 
-        if (livroEntity == null) {
+        if (livro == null) {
             throw new BuscaLivros("Nenhum livro com a ISBN: " + isbn + ", encontrado");
         }
 
-        return livroEntity;
+        return livro;
     }
 
     @Override
-    public List<LivroEntity> buscarAutor(String autor) throws ExcecoesLivro {
+    public List<Livro> buscarAutor(String autor) throws ExcecoesLivro {
         this.verificar();
 
-        List<LivroEntity> livroEntityAutor = repository.buscarAutor(autor);
+        List<Livro> livroAutor = repository.buscarAutor(autor);
 
-        if (livroEntityAutor.isEmpty()) {
+        if (livroAutor.isEmpty()) {
             throw new BuscaLivros("Nenhum autor com esse nome encontrado: " + autor);
         }
 
-        return livroEntityAutor;
+        return livroAutor;
     }
 
     @Override
-    public List<LivroEntity> buscarPreco(double preco) throws ExcecoesLivro {
+    public List<Livro> buscarPreco(double preco) throws ExcecoesLivro {
         this.verificar();
 
-        List<LivroEntity> livroEntities = repository.buscarPreco(preco);
+        List<Livro> livroEntities = repository.buscarPreco(preco);
 
         if (livroEntities.isEmpty()) {
             throw new BuscaLivros("Nenhum livro encontrado com esse preço: " + preco);
@@ -106,50 +106,50 @@ public class LivroService implements LivroInterface {
     public void altTitulo(int isbn, String novoTitulo) throws ExcecoesLivro {
         this.verificar();
 
-        LivroEntity livroEntity = this.buscarISBN(isbn);
-        livroEntity.setTitulo(novoTitulo);
+        Livro livro = this.buscarISBN(isbn);
+        livro.setTitulo(novoTitulo);
 
-        this.repository.updateLivro(livroEntity);
+        this.repository.updateLivro(livro);
     }
 
     @Override
     public void altAutor(int isbn, String novoAutor) throws ExcecoesLivro {
         this.verificar();
 
-        LivroEntity livroEntity = this.buscarISBN(isbn);
-        livroEntity.setAutor(novoAutor);
+        Livro livro = this.buscarISBN(isbn);
+        livro.setAutor(novoAutor);
 
-        this.repository.updateLivro(livroEntity);
+        this.repository.updateLivro(livro);
     }
 
     @Override
     public void altPreco(int isbn, double novoPreco) throws ExcecoesLivro {
         this.verificar();
 
-        LivroEntity livroEntity = this.buscarISBN(isbn);
-        livroEntity.setPreco(novoPreco);
+        Livro livro = this.buscarISBN(isbn);
+        livro.setPreco(novoPreco);
 
-        repository.updateLivro(livroEntity);
+        repository.updateLivro(livro);
     }
 
     @Override
     public void altEstoque(int isbn, int novoEstoque) throws ExcecoesLivro {
         this.verificar();
 
-        LivroEntity livroEntity = this.buscarISBN(isbn);
-        livroEntity.setEstoque(novoEstoque);
+        Livro livro = this.buscarISBN(isbn);
+        livro.setEstoque(novoEstoque);
 
-        this.repository.updateLivro(livroEntity);
+        this.repository.updateLivro(livro);
     }
 
     @Override
     public void altISBN(int isbn, int novaISBN) throws ExcecoesLivro {
         this.verificar();
 
-        LivroEntity livroEntity = this.buscarISBN(isbn);
-        livroEntity.setIsbn(novaISBN);
+        Livro livro = this.buscarISBN(isbn);
+        livro.setIsbn(novaISBN);
 
-        this.repository.updateLivro(livroEntity);
+        this.repository.updateLivro(livro);
     }
 
     public void verificar() throws ExcecoesLivro {

@@ -1,56 +1,53 @@
 package com.livrariaJava.controller;
 
-import com.livrariaJava.entity.LivroEntity;
+import com.livrariaJava.entity.Livro;
 import com.livrariaJava.excecoes.ExcecoesLivro;
-import com.livrariaJava.services.LivroService;
-import org.springframework.stereotype.Controller;
+import com.livrariaJava.services.LivroServiceService;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/livraria")
 public class LivroController {
-    private final LivroService service;
+    private final LivroServiceService service;
 
-    public LivroController(LivroService livroService) {
+    public LivroController(LivroServiceService livroService) {
         this.service = livroService;
     }
 
     @PostMapping("/")
-    public void addLivro(@RequestBody LivroEntity livro) throws ExcecoesLivro {
-        LivroEntity livroEntity = livro;
-        this.service.criarLivro(livroEntity);
+    public void addLivro(@RequestBody Livro livro) throws ExcecoesLivro {
+        this.service.criarLivro(livro);
     }
 
     @DeleteMapping("/{id}")
-    public void delLivro(@PathVariable("id") int isbn) throws ExcecoesLivro {
-        this.service.delLivro(isbn);
+    public void delLivro(@PathVariable("id") int id) throws ExcecoesLivro {
+        this.service.delLivro(id);
     }
 
     @GetMapping("/")
-    public List<LivroEntity> mostarLivros() throws ExcecoesLivro {
+    public List<Livro> mostarLivros() throws ExcecoesLivro {
         return this.service.getLivros();
     }
 
     @GetMapping("/{titulo}")
-    public List<LivroEntity> buscarTitulo(@PathVariable("titulo") String titulo) throws ExcecoesLivro {
+    public List<Livro> buscarTitulo(@PathVariable("titulo") String titulo) throws ExcecoesLivro {
         return this.service.buscarTitulo(titulo);
     }
 
     @GetMapping("/isbn/{isbn}")
-    public LivroEntity buscarISBN(@PathVariable("isbn") int isbn) throws ExcecoesLivro {
+    public Livro buscarISBN(@PathVariable("isbn") int isbn) throws ExcecoesLivro {
         return this.service.buscarISBN(isbn);
     }
 
     @GetMapping("/autor/{autor}")
-    public List<LivroEntity> buscarAutor(@PathVariable("autor") String autor) throws ExcecoesLivro {
+    public List<Livro> buscarAutor(@PathVariable("autor") String autor) throws ExcecoesLivro {
         return this.service.buscarAutor(autor);
     }
 
     @GetMapping("/preco/{preco}")
-    public List<LivroEntity> buscarPreco(@PathVariable("preco") double preco) throws ExcecoesLivro {
+    public List<Livro> buscarPreco(@PathVariable("preco") double preco) throws ExcecoesLivro {
         return this.service.buscarPreco(preco);
     }
 
