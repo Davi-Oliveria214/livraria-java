@@ -64,7 +64,7 @@ public class LivroRepository {
 
     public List<LivroEntity> buscarTitulo(String titulo) {
         List<LivroEntity> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE titulo = ?";
+        String sql = "SELECT * FROM livro WHERE titulo LIKE CONCAT('%', ?, '%')";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setString(1, titulo);
@@ -83,7 +83,7 @@ public class LivroRepository {
 
     public List<LivroEntity> buscarAutor(String autor) {
         List<LivroEntity> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE autor = ?";
+        String sql = "SELECT * FROM livro WHERE autor LIKE CONCAT('%', ?, '%')";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setString(1, autor);
@@ -102,7 +102,7 @@ public class LivroRepository {
 
     public LivroEntity buscarISBN(int isbn) {
         LivroEntity livro = null;
-        String sql = "SELECT * FROM livro WHERE isbn = ?";
+        String sql = "SELECT * FROM livro WHERE isbn LIKE CONCAT('%', ?, '%')";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setInt(1, isbn);
@@ -120,7 +120,7 @@ public class LivroRepository {
 
     public List<LivroEntity> buscarPreco(double preco) {
         List<LivroEntity> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE preco = ?";
+        String sql = "SELECT * FROM livro WHERE preco LIKE CONCAT('%', ?, '%')";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setDouble(1, preco);
