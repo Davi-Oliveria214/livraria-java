@@ -1,14 +1,16 @@
-package services;
+package com.livrariaJava.services;
 
-import entity.LivroEntity;
-import excecoes.BuscaLivros;
-import excecoes.ExcecoesLivro;
-import interfaces.LivroInterface;
-import repository.LivroRepository;
+import com.livrariaJava.entity.LivroEntity;
+import com.livrariaJava.excecoes.BuscaLivros;
+import com.livrariaJava.excecoes.ExcecoesLivro;
+import com.livrariaJava.interfaces.LivroInterface;
+import com.livrariaJava.repository.LivroRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
+@Service
 public class LivroService implements LivroInterface {
     private final LivroRepository repository;
 

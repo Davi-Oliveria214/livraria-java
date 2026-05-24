@@ -1,6 +1,6 @@
-package interfaces;
+package com.livrariaJava.interfaces;
 
-import entity.LivroEntity;
+import com.livrariaJava.entity.LivroEntity;
 
 import java.util.List;
 

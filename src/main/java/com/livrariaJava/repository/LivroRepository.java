@@ -1,13 +1,15 @@
-package repository;
+package com.livrariaJava.repository;
 
-import connection.LivroConnection;
-import entity.LivroEntity;
-import excecoes.ExcecoesLivro;
+import com.livrariaJava.connection.LivroConnection;
+import com.livrariaJava.entity.LivroEntity;
+import com.livrariaJava.excecoes.ExcecoesLivro;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class LivroRepository {
     private final LivroConnection conn;
     private ResultSet res;
@@ -25,7 +27,7 @@ public class LivroRepository {
             stm.setInt(3, livro.getIsbn());
             stm.setDouble(4, livro.getPreco());
             stm.setInt(5, livro.getEstoque());
-            stm.setDate(6, Date.valueOf(livro.getLancamento()));
+            stm.setDate(6, (Date) livro.getLancamento());
 
             stm.executeUpdate();
         } catch (SQLException e) {
@@ -53,7 +55,7 @@ public class LivroRepository {
             stm.setInt(3, livro.getIsbn());
             stm.setDouble(4, livro.getPreco());
             stm.setInt(5, livro.getEstoque());
-            stm.setDate(6, Date.valueOf(livro.getLancamento()));
+            stm.setDate(6, (Date) livro.getLancamento());
             stm.setInt(7, livro.getId());
 
             stm.executeUpdate();
@@ -71,7 +73,7 @@ public class LivroRepository {
             res = stm.executeQuery();
 
             while (res.next()) {
-                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento"));
                 livros.add(livro);
             }
         } catch (SQLException e) {
@@ -90,7 +92,7 @@ public class LivroRepository {
             res = stm.executeQuery();
 
             while (res.next()) {
-                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento"));
                 livros.add(livro);
             }
         } catch (SQLException e) {
@@ -102,14 +104,14 @@ public class LivroRepository {
 
     public LivroEntity buscarISBN(int isbn) {
         LivroEntity livro = null;
-        String sql = "SELECT * FROM livro WHERE isbn LIKE CONCAT('%', ?, '%')";
+        String sql = "SELECT * FROM livro WHERE isbn = ?";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setInt(1, isbn);
             res = stm.executeQuery();
 
             if (res.next()) {
-                livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento"));
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar ISBN", e);
@@ -127,7 +129,7 @@ public class LivroRepository {
             res = stm.executeQuery();
 
             while (res.next()) {
-                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento"));
                 livros.add(livro);
             }
         } catch (SQLException e) {
@@ -145,7 +147,7 @@ public class LivroRepository {
             res = stm.executeQuery();
 
             while (res.next()) {
-                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                LivroEntity livro = new LivroEntity(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento"));
                 livros.add(livro);
             }
         } catch (SQLException e) {

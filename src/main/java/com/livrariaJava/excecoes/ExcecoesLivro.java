@@ -1,4 +1,4 @@
-package excecoes;
+package com.livrariaJava.excecoes;
 
 public class ExcecoesLivro extends RuntimeException {
     public ExcecoesLivro(String message) {
