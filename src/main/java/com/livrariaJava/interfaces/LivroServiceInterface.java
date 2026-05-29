@@ -3,9 +3,10 @@ package com.livrariaJava.interfaces;
 import com.livrariaJava.entity.Livro;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LivroServiceInterface {
-    public void criarLivro(Livro livro);
+    public Livro criarLivro(Livro livro);
 
     public void delLivro(int isbn);
 
@@ -13,9 +14,9 @@ public interface LivroServiceInterface {
 
     public List<Livro> buscarTitulo(String titulo);
 
-    public List<Livro> buscarISBN(int id);
+    public List<Livro> buscarISBN(int isbn);
 
-    public Livro buscarId(int isbn);
+    public Optional<Livro> buscarId(int id);
 
     public List<Livro> buscarAutor(String autor);
 

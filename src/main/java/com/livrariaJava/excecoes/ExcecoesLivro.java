@@ -5,7 +5,7 @@ public class ExcecoesLivro extends RuntimeException {
         super(message);
     }
 
-    public ExcecoesLivro(String message, Throwable causa){
+    public ExcecoesLivro(String message, Throwable causa) {
         super(message, causa);
     }
 }

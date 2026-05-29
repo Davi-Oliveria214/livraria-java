@@ -19,7 +19,7 @@ public class LivroRepository {
         this.conn = livroConnection;
     }
 
-    public void newLivro(Livro livro) {
+    public Livro newLivro(Livro livro) {
         String sql = "INSERT INTO livro(titulo, autor, isbn, preco, estoque, lancamento) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
@@ -31,6 +31,7 @@ public class LivroRepository {
             stm.setDate(6, Date.valueOf(livro.getLancamento()));
 
             stm.executeUpdate();
+            return livro;
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao adicionar livro", e);
         }
@@ -120,6 +121,24 @@ public class LivroRepository {
         }
 
         return livros;
+    }
+
+    public Livro buscarExataISBN(int isbn) {
+        Livro livro = null;
+        String sql = "SELECT * FROM livro WHERE isbn = ?";
+
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            stm.setInt(1, isbn);
+            res = stm.executeQuery();
+
+            while (res.next()) {
+                livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+            }
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao buscar ISBN", e);
+        }
+
+        return livro;
     }
 
     public Livro buscarId(int id) {

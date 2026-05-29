@@ -1,7 +1,7 @@
 package com.livrariaJava.services;
 
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.excecoes.BuscaLivros;
+import com.livrariaJava.excecoes.BuscaVazia;
 import com.livrariaJava.excecoes.ExcecoesLivro;
 import com.livrariaJava.interfaces.LivroServiceInterface;
 import com.livrariaJava.repository.LivroRepository;
@@ -9,55 +9,56 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class LivroServiceService implements LivroServiceInterface {
     private final LivroRepository repository;
 
     public LivroServiceService(LivroRepository livroRepository) {
-        repository = livroRepository;
+        this.repository = livroRepository;
     }
 
     @Override
-    public void criarLivro(Livro livro) {
+    public Livro criarLivro(Livro livro) {
 
-        if (repository.buscarISBN(livro.getIsbn()) != null) {
-            throw new BuscaLivros("Essa ISBN já está cadastrada");
+        if (this.repository.buscarExataISBN(livro.getIsbn()) != null) {
+            throw new BuscaVazia("Essa ISBN já está cadastrada");
         }
 
-        for (Livro livros : repository.buscarTitulo(livro.getTitulo())) {
-            if (Objects.equals(livros.getTitulo(), livro.getTitulo()) && Objects.equals(livros.getAutor(), livro.getAutor())) {
-                throw new BuscaLivros("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
+        for (Livro l : this.repository.buscarTitulo(livro.getTitulo())) {
+            if (Objects.equals(l.getTitulo(), livro.getTitulo()) && Objects.equals(l.getAutor(), livro.getAutor())) {
+                throw new BuscaVazia("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
             }
         }
 
-        repository.newLivro(livro);
+        return this.repository.newLivro(livro);
     }
 
     @Override
     public void delLivro(int id) throws ExcecoesLivro {
-        Livro livro = repository.buscarId(id);
+        Livro livro = this.repository.buscarId(id);
 
         if (livro == null) {
-            throw new BuscaLivros("Nenhum livro encontrado");
+            throw new BuscaVazia("Nenhum livro encontrado");
         }
 
-        repository.delLivro(livro);
+        this.repository.delLivro(livro);
     }
 
     @Override
     public List<Livro> getLivros() {
-        return repository.todosLivros();
+        return this.repository.todosLivros();
     }
 
     @Override
     public List<Livro> buscarTitulo(String titulo) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livroEntities = repository.buscarTitulo(titulo);
+        List<Livro> livroEntities = this.repository.buscarTitulo(titulo);
 
         if (livroEntities.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro com o titulo: " + titulo + ", encontrado");
+            throw new BuscaVazia("Nenhum livro com o titulo: " + titulo + ", encontrado");
         }
 
         return livroEntities;
@@ -67,28 +68,28 @@ public class LivroServiceService implements LivroServiceInterface {
     public List<Livro> buscarISBN(int isbn) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livros = repository.buscarISBN(isbn);
+        List<Livro> livros = this.repository.buscarISBN(isbn);
 
         if (livros == null) {
-            throw new BuscaLivros("Nenhum livro com a ISBN: " + isbn + ", encontrado");
+            throw new BuscaVazia("Nenhum livro com a ISBN: " + isbn + ", encontrado");
         }
 
         return livros;
     }
 
     @Override
-    public Livro buscarId(int id) {
-        return repository.buscarId(id);
+    public Optional<Livro> buscarId(int id) {
+        return Optional.ofNullable(this.repository.buscarId(id));
     }
 
     @Override
     public List<Livro> buscarAutor(String autor) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livroAutor = repository.buscarAutor(autor);
+        List<Livro> livroAutor = this.repository.buscarAutor(autor);
 
         if (livroAutor.isEmpty()) {
-            throw new BuscaLivros("Nenhum autor com esse nome encontrado: " + autor);
+            throw new BuscaVazia("Nenhum autor com esse nome encontrado: " + autor);
         }
 
         return livroAutor;
@@ -98,10 +99,10 @@ public class LivroServiceService implements LivroServiceInterface {
     public List<Livro> buscarPreco(double preco) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livroEntities = repository.buscarPreco(preco);
+        List<Livro> livroEntities = this.repository.buscarPreco(preco);
 
         if (livroEntities.isEmpty()) {
-            throw new BuscaLivros("Nenhum livro encontrado com esse preço: " + preco);
+            throw new BuscaVazia("Nenhum livro encontrado com esse preço: " + preco);
         }
 
         return livroEntities;
@@ -134,7 +135,7 @@ public class LivroServiceService implements LivroServiceInterface {
         Livro livro = this.buscarId(id);
         livro.setPreco(novoPreco);
 
-        repository.updateLivro(livro);
+        this.repository.updateLivro(livro);
     }
 
     @Override
@@ -158,8 +159,8 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     public void verificar() throws ExcecoesLivro {
-        if (repository.isTabelaVazia()) {
-            throw new BuscaLivros("Nenhum livro cadastrado");
+        if (this.repository.isTabelaVazia()) {
+            throw new BuscaVazia("Nenhum livro cadastrado");
         }
     }
 }
