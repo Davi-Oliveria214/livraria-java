@@ -16,7 +16,7 @@ public interface LivroServiceInterface {
 
     public List<Livro> buscarISBN(int isbn);
 
-    public Optional<Livro> buscarId(int id);
+    public Livro buscarId(int id);
 
     public List<Livro> buscarAutor(String autor);
 

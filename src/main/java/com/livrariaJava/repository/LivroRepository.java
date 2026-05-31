@@ -6,7 +6,6 @@ import com.livrariaJava.excecoes.ExcecoesLivro;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,11 +36,11 @@ public class LivroRepository {
         }
     }
 
-    public void delLivro(Livro livro) {
+    public void delLivro(Integer id) {
         String sql = "DELETE FROM livro WHERE id = ?";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setInt(1, livro.getId());
+            stm.setInt(1, id);
             stm.executeUpdate();
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao apagar livro", e);
@@ -153,7 +152,7 @@ public class LivroRepository {
                 livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar ISBN", e);
+            throw new ExcecoesLivro("Erro ao buscar id", e);
         }
 
         return livro;

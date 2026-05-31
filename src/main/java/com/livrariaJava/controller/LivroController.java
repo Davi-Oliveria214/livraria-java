@@ -1,6 +1,7 @@
 package com.livrariaJava.controller;
 
 import com.livrariaJava.entity.Livro;
+import com.livrariaJava.excecoes.BuscaVazia;
 import com.livrariaJava.excecoes.ExcecoesLivro;
 import com.livrariaJava.services.LivroServiceService;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +19,23 @@ public class LivroController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Livro> addLivro(@RequestBody Livro livro) {
-        Livro l = this.service.criarLivro(livro);
-        return ResponseEntity.status(201).body(l);
+    public ResponseEntity<?> addLivro(@RequestBody Livro livro) {
+        try {
+            Livro l = this.service.criarLivro(livro);
+            return ResponseEntity.status(201).body(l);
+        } catch (ExcecoesLivro el) {
+            return ResponseEntity.status(409).body(el.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void delLivro(@PathVariable int id) {
-        this.service.delLivro(id);
+    public String delLivro(@PathVariable int id) {
+        try {
+            this.service.delLivro(id);
+            return "Livro deletado com sucesso";
+        } catch (ExcecoesLivro el) {
+            return el.getMessage();
+        }
     }
 
     @GetMapping("/")
@@ -34,48 +44,68 @@ public class LivroController {
     }
 
     @GetMapping("/{id}")
-    public Livro buscarId(@PathVariable int id) throws ExcecoesLivro {
-        return this.service.buscarId(id).orElseThrow(() -> new ExcecoesLivro("Nenhum livro encontrado"));
+    public ResponseEntity<?> buscarId(@PathVariable int id) {
+        try {
+            Livro l = this.service.buscarId(id);
+            return ResponseEntity.status(200).body(l);
+        } catch (BuscaVazia el) {
+            return ResponseEntity.status(404).body(el.getMessage());
+        }
     }
 
-    @GetMapping("/titulo/{titulo}")
-    public List<Livro> buscarTitulo(@PathVariable String titulo) throws ExcecoesLivro {
-        return this.service.buscarTitulo(titulo);
+    @GetMapping("/buscar/titulo")
+    public ResponseEntity<?> buscarTitulo(@RequestParam("titulo") String titulo) {
+        try {
+            List<Livro> l = this.service.buscarTitulo(titulo);
+            return ResponseEntity.status(200).body(l);
+        } catch (BuscaVazia el) {
+            return ResponseEntity.status(404).body(el.getMessage());
+        }
     }
 
-    @GetMapping("/isbn/{isbn}")
-    public List<Livro> buscarISBN(@PathVariable int isbn) throws ExcecoesLivro {
-        return this.service.buscarISBN(isbn);
+    @GetMapping("/buscar/isbn")
+    public ResponseEntity<?> buscarISBN(@RequestParam("isbn") int isbn) {
+        try {
+            List<Livro> l = this.service.buscarISBN(isbn);
+            return ResponseEntity.status(200).body(l);
+        } catch (BuscaVazia el) {
+            return ResponseEntity.status(404).body(el.getMessage());
+        }
     }
 
-    @GetMapping("/autor/{autor}")
-    public List<Livro> buscarAutor(@PathVariable String autor) throws ExcecoesLivro {
-        return this.service.buscarAutor(autor);
+    @GetMapping("/buscar/autor")
+    public ResponseEntity<?> buscarAutor(@PathVariable String autor) {
+        try {
+            List<Livro> l = this.service.buscarAutor(autor);
+            return ResponseEntity.status(200).body(l);
+        } catch (BuscaVazia el) {
+            return ResponseEntity.status(404).body(el.getMessage());
+        }
     }
 
-    @GetMapping("/preco/{preco}")
-    public List<Livro> buscarPreco(@PathVariable double preco) throws ExcecoesLivro {
+    @GetMapping("/preco/param")
+    public List<Livro> buscarPreco(@PathVariable double preco) {
         return this.service.buscarPreco(preco);
     }
 
-    public void altTitulo(int isbn, String novoTitulo) throws ExcecoesLivro {
-        this.service.altTitulo(isbn, novoTitulo);
+    public void altTitulo(int id, String novoTitulo) {
+        this.service.altTitulo(id, novoTitulo);
     }
 
-    public void altAutor(int isbn, String novoAutor) throws ExcecoesLivro {
-        this.service.altAutor(isbn, novoAutor);
+    public void altAutor(int id, String novoAutor) {
+        this.service.altAutor(id, novoAutor);
     }
 
-    public void altISBN(int isbn, int novaISBN) throws ExcecoesLivro {
-        this.service.altISBN(isbn, novaISBN);
+    public void altISBN(int id, int novaISBN) {
+        this.service.altISBN(id, novaISBN);
     }
 
-    public void altPreco(int isbn, double preco) {
-        this.service.altPreco(isbn, preco);
+    public void altPreco(int id, double preco) {
+        this.service.altPreco(id, preco);
     }
 
-    public void altEstoque(int isbn, int estoque) {
-        this.service.altEstoque(isbn, estoque);
+    public void altEstoque(int id, int estoque) {
+        this.service.altEstoque(id, estoque);
     }
 
     public void verificar() throws ExcecoesLivro {

@@ -20,15 +20,14 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro criarLivro(Livro livro) {
-
-        if (this.repository.buscarExataISBN(livro.getIsbn()) != null) {
-            throw new BuscaVazia("Essa ISBN já está cadastrada");
-        }
+    public Livro criarLivro(Livro livro) throws ExcecoesLivro {
+        Optional.ofNullable(this.repository.buscarExataISBN(livro.getIsbn())).ifPresent(l -> {
+            throw new ExcecoesLivro("Essa ISBN já está cadastrada");
+        });
 
         for (Livro l : this.repository.buscarTitulo(livro.getTitulo())) {
             if (Objects.equals(l.getTitulo(), livro.getTitulo()) && Objects.equals(l.getAutor(), livro.getAutor())) {
-                throw new BuscaVazia("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
+                throw new ExcecoesLivro("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
             }
         }
 
@@ -37,17 +36,15 @@ public class LivroServiceService implements LivroServiceInterface {
 
     @Override
     public void delLivro(int id) throws ExcecoesLivro {
-        Livro livro = this.repository.buscarId(id);
+        Optional.ofNullable(this.repository.buscarId(id)).orElseThrow(() -> new BuscaVazia("Erro ao buscar livro"));
 
-        if (livro == null) {
-            throw new BuscaVazia("Nenhum livro encontrado");
-        }
-
-        this.repository.delLivro(livro);
+        this.repository.delLivro(id);
     }
 
     @Override
-    public List<Livro> getLivros() {
+    public List<Livro> getLivros() throws ExcecoesLivro {
+        this.verificar();
+
         return this.repository.todosLivros();
     }
 
@@ -55,57 +52,33 @@ public class LivroServiceService implements LivroServiceInterface {
     public List<Livro> buscarTitulo(String titulo) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livroEntities = this.repository.buscarTitulo(titulo);
-
-        if (livroEntities.isEmpty()) {
-            throw new BuscaVazia("Nenhum livro com o titulo: " + titulo + ", encontrado");
-        }
-
-        return livroEntities;
+        return Optional.ofNullable(this.repository.buscarTitulo(titulo)).filter(l -> !l.isEmpty()).orElseThrow(() -> new ExcecoesLivro("Nenhum livro encontrado!!!"));
     }
 
     @Override
     public List<Livro> buscarISBN(int isbn) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livros = this.repository.buscarISBN(isbn);
-
-        if (livros == null) {
-            throw new BuscaVazia("Nenhum livro com a ISBN: " + isbn + ", encontrado");
-        }
-
-        return livros;
+        return Optional.ofNullable(this.repository.buscarISBN(isbn)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro com a ISBN: " + isbn + ", encontrado"));
     }
 
     @Override
-    public Optional<Livro> buscarId(int id) {
-        return Optional.ofNullable(this.repository.buscarId(id));
+    public Livro buscarId(int id) throws ExcecoesLivro {
+        return Optional.ofNullable(this.repository.buscarId(id)).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado"));
     }
 
     @Override
     public List<Livro> buscarAutor(String autor) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livroAutor = this.repository.buscarAutor(autor);
-
-        if (livroAutor.isEmpty()) {
-            throw new BuscaVazia("Nenhum autor com esse nome encontrado: " + autor);
-        }
-
-        return livroAutor;
+        return Optional.ofNullable(this.repository.buscarAutor(autor)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum autor com esse nome encontrado: " + autor));
     }
 
     @Override
     public List<Livro> buscarPreco(double preco) throws ExcecoesLivro {
         this.verificar();
 
-        List<Livro> livroEntities = this.repository.buscarPreco(preco);
-
-        if (livroEntities.isEmpty()) {
-            throw new BuscaVazia("Nenhum livro encontrado com esse preço: " + preco);
-        }
-
-        return livroEntities;
+        return Optional.ofNullable(this.repository.buscarPreco(preco)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com esse preço: " + preco));
     }
 
     @Override
