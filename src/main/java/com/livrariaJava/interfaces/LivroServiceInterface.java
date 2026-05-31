@@ -1,34 +1,35 @@
 package com.livrariaJava.interfaces;
 
 import com.livrariaJava.entity.Livro;
-
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface LivroServiceInterface {
     public Livro criarLivro(Livro livro);
 
-    public String delLivro(int isbn);
+    public String delLivro(Long id);
 
     public List<Livro> getLivros();
 
     public List<Livro> buscarTitulo(String titulo);
 
-    public List<Livro> buscarISBN(int isbn);
+    public List<Livro> buscarISBN(Integer isbn);
 
-    public Livro buscarId(int id);
+    public Livro buscarId(Long id);
 
     public List<Livro> buscarAutor(String autor);
 
-    public List<Livro> buscarPreco(double preco);
+    public List<Livro> buscarPreco(Double preco);
 
-    public void altTitulo(int isbn, String novoTitulo);
+    public Livro altTitulo(Long id, String novoTitulo);
 
-    public void altAutor(int isbn, String novoAutor);
+    public Livro altAutor(Long id, String novoAutor);
 
-    public void altPreco(int isbn, double novoPreco);
+    public Livro altPreco(Long id, Double novoPreco);
 
-    public void altEstoque(int isbn, int novoEstoque);
+    public Livro altEstoque(Long id, Integer novoEstoque);
 
-    public void altISBN(int isbn, int novaISBN);
+    public Livro altISBN(Long id, Integer novaISBN);
+
+    public Livro altData(Long id, LocalDate novaData);
 }

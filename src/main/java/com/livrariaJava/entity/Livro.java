@@ -54,7 +54,7 @@ public class Livro {
         this.autor = autor;
     }
 
-    public double getPreco() {
+    public Double getPreco() {
         return preco;
     }
 

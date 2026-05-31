@@ -1,12 +1,14 @@
 package com.livrariaJava.controller;
 
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.excecoes.BuscaVazia;
 import com.livrariaJava.excecoes.ExcecoesLivro;
 import com.livrariaJava.services.LivroServiceService;
+import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -29,7 +31,7 @@ public class LivroController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delLivro(@PathVariable int id) {
+    public ResponseEntity<?> delLivro(@PathVariable Long id) {
         try {
             return ResponseEntity.status(200).body(this.service.delLivro(id));
         } catch (ExcecoesLivro el) {
@@ -48,7 +50,7 @@ public class LivroController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarId(@PathVariable int id) {
+    public ResponseEntity<?> buscarId(@PathVariable Long id) {
         try {
             Livro l = this.service.buscarId(id);
             return ResponseEntity.status(200).body(l);
@@ -57,7 +59,7 @@ public class LivroController {
         }
     }
 
-    @GetMapping("/buscar/titulo")
+    @GetMapping("/titulo")
     public ResponseEntity<?> buscarTitulo(@RequestParam("titulo") String titulo) {
         try {
             List<Livro> l = this.service.buscarTitulo(titulo);
@@ -67,8 +69,8 @@ public class LivroController {
         }
     }
 
-    @GetMapping("/buscar/isbn")
-    public ResponseEntity<?> buscarISBN(@RequestParam("isbn") int isbn) {
+    @GetMapping("/isbn")
+    public ResponseEntity<?> buscarISBN(@RequestParam("isbn") Integer isbn) {
         try {
             List<Livro> l = this.service.buscarISBN(isbn);
             return ResponseEntity.status(200).body(l);
@@ -77,7 +79,7 @@ public class LivroController {
         }
     }
 
-    @GetMapping("/buscar/autor")
+    @GetMapping("/autor")
     public ResponseEntity<?> buscarAutor(@RequestParam("autor") String autor) {
         try {
             List<Livro> l = this.service.buscarAutor(autor);
@@ -87,8 +89,8 @@ public class LivroController {
         }
     }
 
-    @GetMapping("/buscar/preco")
-    public ResponseEntity<?> buscarPreco(@RequestParam("preco") double preco) {
+    @GetMapping("/preco")
+    public ResponseEntity<?> buscarPreco(@RequestParam("preco") Double preco) {
         try {
             List<Livro> l = this.service.buscarPreco(preco);
             return ResponseEntity.status(200).body(l);
@@ -97,27 +99,57 @@ public class LivroController {
         }
     }
 
-    public void altTitulo(int id, String novoTitulo) {
-        this.service.altTitulo(id, novoTitulo);
+    @PatchMapping("/{id}/novoTitulo")
+    public ResponseEntity<?> altTitulo(@PathVariable("id") Long id, @RequestParam("novoTitulo") String novoTitulo) {
+        try {
+            return ResponseEntity.status(200).body(this.service.altTitulo(id, novoTitulo));
+        } catch (ExcecoesLivro e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
-    public void altAutor(int id, String novoAutor) {
-        this.service.altAutor(id, novoAutor);
+    @PatchMapping("/{id}/novoAutor")
+    public ResponseEntity<?> altAutor(@PathVariable("id") Long id, @RequestParam("novoAutor") String novoAutor) {
+        try {
+            return ResponseEntity.status(200).body(this.service.altAutor(id, novoAutor));
+        } catch (ExcecoesLivro e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
-    public void altISBN(int id, int novaISBN) {
-        this.service.altISBN(id, novaISBN);
+    @PatchMapping("/{id}/novaIsbn")
+    public ResponseEntity<?> altISBN(@PathVariable("id") Long id, @RequestParam("novaIsbn") Integer novaISBN) {
+        try {
+            return ResponseEntity.status(200).body(this.service.altISBN(id, novaISBN));
+        } catch (ExcecoesLivro e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
-    public void altPreco(int id, double preco) {
-        this.service.altPreco(id, preco);
+    @PatchMapping("/{id}/novoPreco")
+    public ResponseEntity<?> altPreco(@PathVariable("id") Long id, @RequestParam("novoPreco") Double preco) {
+        try {
+            return ResponseEntity.status(200).body(this.service.altPreco(id, preco));
+        } catch (ExcecoesLivro e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
-    public void altEstoque(int id, int estoque) {
-        this.service.altEstoque(id, estoque);
+    @PatchMapping("/novoEstoque/{id}")
+    public ResponseEntity<?> altEstoque(@PathVariable("id") Long id, @RequestParam("novoEstoque") Integer estoque) {
+        try {
+            return ResponseEntity.status(200).body(this.service.altEstoque(id, estoque));
+        } catch (ExcecoesLivro e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
-    public void verificar() throws ExcecoesLivro {
-        this.service.verificar();
+    @PatchMapping("/{id}/novaData")
+    public ResponseEntity<?> altData(@PathVariable("id") Long id, @RequestParam("novaData") LocalDate novaData) {
+        try {
+            return ResponseEntity.status(200).body(this.service.altData(id, novaData));
+        } catch (ExcecoesLivro e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 }
