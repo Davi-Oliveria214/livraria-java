@@ -3,19 +3,19 @@ package com.livrariaJava.entity;
 import java.time.LocalDate;
 
 public class Livro {
-    private int id;
+    private Long id;
     private String titulo;
     private String autor;
-    private double preco;
-    private int isbn;
-    private int estoque;
+    private Double preco;
+    private Integer isbn;
+    private Integer estoque;
     private LocalDate lancamento;
 
     public Livro() {
 
     }
 
-    public Livro(String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
+    public Livro(String titulo, String autor, Double preco, Integer isbn, Integer estoque, LocalDate lancamento) {
         this.titulo = titulo;
         this.autor = autor;
         this.preco = preco;
@@ -24,7 +24,7 @@ public class Livro {
         this.lancamento = lancamento;
     }
 
-    public Livro(int id, String titulo, String autor, double preco, int isbn, int estoque, LocalDate lancamento) {
+    public Livro(Long id, String titulo, String autor, Double preco, Integer isbn, Integer estoque, LocalDate lancamento) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
@@ -34,7 +34,7 @@ public class Livro {
         this.lancamento = lancamento;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -58,23 +58,23 @@ public class Livro {
         return preco;
     }
 
-    public void setPreco(double preco) {
+    public void setPreco(Double preco) {
         this.preco = preco;
     }
 
-    public int getIsbn() {
+    public Integer getIsbn() {
         return isbn;
     }
 
-    public void setIsbn(int isbn) {
+    public void setIsbn(Integer isbn) {
         this.isbn = isbn;
     }
 
-    public int getEstoque() {
+    public Integer getEstoque() {
         return estoque;
     }
 
-    public void setEstoque(int estoque) {
+    public void setEstoque(Integer estoque) {
         this.estoque = estoque;
     }
 
