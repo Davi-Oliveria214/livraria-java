@@ -3,12 +3,10 @@ package com.livrariaJava.controller;
 import com.livrariaJava.entity.Livro;
 import com.livrariaJava.excecoes.ExcecoesLivro;
 import com.livrariaJava.services.LivroServiceService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -99,8 +97,8 @@ public class LivroController {
         }
     }
 
-    @PatchMapping("/{id}/novoTitulo")
-    public ResponseEntity<?> altTitulo(@PathVariable("id") Long id, @RequestParam("novoTitulo") String novoTitulo) {
+    @PatchMapping("/{id}/titulo")
+    public ResponseEntity<?> altTitulo(@PathVariable("id") Long id, @RequestParam("titulo") String novoTitulo) {
         try {
             return ResponseEntity.status(200).body(this.service.altTitulo(id, novoTitulo));
         } catch (ExcecoesLivro e) {
@@ -108,8 +106,8 @@ public class LivroController {
         }
     }
 
-    @PatchMapping("/{id}/novoAutor")
-    public ResponseEntity<?> altAutor(@PathVariable("id") Long id, @RequestParam("novoAutor") String novoAutor) {
+    @PatchMapping("/{id}/autor")
+    public ResponseEntity<?> altAutor(@PathVariable("id") Long id, @RequestParam("autor") String novoAutor) {
         try {
             return ResponseEntity.status(200).body(this.service.altAutor(id, novoAutor));
         } catch (ExcecoesLivro e) {
@@ -117,8 +115,8 @@ public class LivroController {
         }
     }
 
-    @PatchMapping("/{id}/novaIsbn")
-    public ResponseEntity<?> altISBN(@PathVariable("id") Long id, @RequestParam("novaIsbn") Integer novaISBN) {
+    @PatchMapping("/{id}/isbn")
+    public ResponseEntity<?> altISBN(@PathVariable("id") Long id, @RequestParam("isbn") Integer novaISBN) {
         try {
             return ResponseEntity.status(200).body(this.service.altISBN(id, novaISBN));
         } catch (ExcecoesLivro e) {
@@ -126,8 +124,8 @@ public class LivroController {
         }
     }
 
-    @PatchMapping("/{id}/novoPreco")
-    public ResponseEntity<?> altPreco(@PathVariable("id") Long id, @RequestParam("novoPreco") Double preco) {
+    @PatchMapping("/{id}/preco")
+    public ResponseEntity<?> altPreco(@PathVariable("id") Long id, @RequestParam("preco") Double preco) {
         try {
             return ResponseEntity.status(200).body(this.service.altPreco(id, preco));
         } catch (ExcecoesLivro e) {
@@ -135,8 +133,8 @@ public class LivroController {
         }
     }
 
-    @PatchMapping("/novoEstoque/{id}")
-    public ResponseEntity<?> altEstoque(@PathVariable("id") Long id, @RequestParam("novoEstoque") Integer estoque) {
+    @PatchMapping("/{id}/estoque")
+    public ResponseEntity<?> altEstoque(@PathVariable("id") Long id, @RequestParam("estoque") Integer estoque) {
         try {
             return ResponseEntity.status(200).body(this.service.altEstoque(id, estoque));
         } catch (ExcecoesLivro e) {
@@ -144,8 +142,8 @@ public class LivroController {
         }
     }
 
-    @PatchMapping("/{id}/novaData")
-    public ResponseEntity<?> altData(@PathVariable("id") Long id, @RequestParam("novaData") LocalDate novaData) {
+    @PatchMapping("/{id}/data")
+    public ResponseEntity<?> altData(@PathVariable("id") Long id, @RequestParam("data") LocalDate novaData) {
         try {
             return ResponseEntity.status(200).body(this.service.altData(id, novaData));
         } catch (ExcecoesLivro e) {
