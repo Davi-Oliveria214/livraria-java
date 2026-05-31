@@ -29,18 +29,22 @@ public class LivroController {
     }
 
     @DeleteMapping("/{id}")
-    public String delLivro(@PathVariable int id) {
+    public ResponseEntity<?> delLivro(@PathVariable int id) {
         try {
-            this.service.delLivro(id);
-            return "Livro deletado com sucesso";
+            return ResponseEntity.status(200).body(this.service.delLivro(id));
         } catch (ExcecoesLivro el) {
-            return el.getMessage();
+            return ResponseEntity.status(400).body(el.getMessage());
         }
     }
 
     @GetMapping("/")
-    public List<Livro> mostarLivros() {
-        return this.service.getLivros();
+    public ResponseEntity<?> mostarLivros() {
+        try {
+            List<Livro> l = this.service.getLivros();
+            return ResponseEntity.status(200).body(l);
+        } catch (ExcecoesLivro el) {
+            return ResponseEntity.status(404).body(el.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
@@ -48,7 +52,7 @@ public class LivroController {
         try {
             Livro l = this.service.buscarId(id);
             return ResponseEntity.status(200).body(l);
-        } catch (BuscaVazia el) {
+        } catch (ExcecoesLivro el) {
             return ResponseEntity.status(404).body(el.getMessage());
         }
     }
@@ -58,7 +62,7 @@ public class LivroController {
         try {
             List<Livro> l = this.service.buscarTitulo(titulo);
             return ResponseEntity.status(200).body(l);
-        } catch (BuscaVazia el) {
+        } catch (ExcecoesLivro el) {
             return ResponseEntity.status(404).body(el.getMessage());
         }
     }
@@ -68,24 +72,29 @@ public class LivroController {
         try {
             List<Livro> l = this.service.buscarISBN(isbn);
             return ResponseEntity.status(200).body(l);
-        } catch (BuscaVazia el) {
+        } catch (ExcecoesLivro el) {
             return ResponseEntity.status(404).body(el.getMessage());
         }
     }
 
     @GetMapping("/buscar/autor")
-    public ResponseEntity<?> buscarAutor(@PathVariable String autor) {
+    public ResponseEntity<?> buscarAutor(@RequestParam("autor") String autor) {
         try {
             List<Livro> l = this.service.buscarAutor(autor);
             return ResponseEntity.status(200).body(l);
-        } catch (BuscaVazia el) {
+        } catch (ExcecoesLivro el) {
             return ResponseEntity.status(404).body(el.getMessage());
         }
     }
 
-    @GetMapping("/preco/param")
-    public List<Livro> buscarPreco(@PathVariable double preco) {
-        return this.service.buscarPreco(preco);
+    @GetMapping("/buscar/preco")
+    public ResponseEntity<?> buscarPreco(@RequestParam("preco") double preco) {
+        try {
+            List<Livro> l = this.service.buscarPreco(preco);
+            return ResponseEntity.status(200).body(l);
+        } catch (ExcecoesLivro el) {
+            return ResponseEntity.status(404).body(el.getMessage());
+        }
     }
 
     public void altTitulo(int id, String novoTitulo) {

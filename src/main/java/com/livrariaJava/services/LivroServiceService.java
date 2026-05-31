@@ -35,10 +35,11 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public void delLivro(int id) throws ExcecoesLivro {
-        Optional.ofNullable(this.repository.buscarId(id)).orElseThrow(() -> new BuscaVazia("Erro ao buscar livro"));
+    public String delLivro(int id) throws ExcecoesLivro {
+        Livro livro = this.buscarId(id);
 
         this.repository.delLivro(id);
+        return "Livro: " + livro.getTitulo() + " do autor " + livro.getAutor() + " deletado com sucesso";
     }
 
     @Override
@@ -52,7 +53,7 @@ public class LivroServiceService implements LivroServiceInterface {
     public List<Livro> buscarTitulo(String titulo) throws ExcecoesLivro {
         this.verificar();
 
-        return Optional.ofNullable(this.repository.buscarTitulo(titulo)).filter(l -> !l.isEmpty()).orElseThrow(() -> new ExcecoesLivro("Nenhum livro encontrado!!!"));
+        return Optional.ofNullable(this.repository.buscarTitulo(titulo)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado"));
     }
 
     @Override

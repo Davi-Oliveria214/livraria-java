@@ -5,6 +5,7 @@ import com.livrariaJava.entity.Livro;
 import com.livrariaJava.excecoes.ExcecoesLivro;
 import org.springframework.stereotype.Repository;
 
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,6 @@ import java.util.List;
 @Repository
 public class LivroRepository {
     private final LivroConnection conn;
-    private ResultSet res;
 
     public LivroRepository(LivroConnection livroConnection) {
         this.conn = livroConnection;
@@ -71,11 +71,12 @@ public class LivroRepository {
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setString(1, titulo);
-            res = stm.executeQuery();
 
-            while (res.next()) {
-                Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
-                livros.add(livro);
+            try (ResultSet res = stm.executeQuery()) {
+                while (res.next()) {
+                    Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    livros.add(livro);
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar titulo", e);
@@ -90,11 +91,12 @@ public class LivroRepository {
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setString(1, autor);
-            res = stm.executeQuery();
 
-            while (res.next()) {
-                Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
-                livros.add(livro);
+            try (ResultSet res = stm.executeQuery()) {
+                while (res.next()) {
+                    Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    livros.add(livro);
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar autor", e);
@@ -109,11 +111,12 @@ public class LivroRepository {
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setInt(1, isbn);
-            res = stm.executeQuery();
 
-            while (res.next()) {
-                Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
-                livros.add(livro);
+            try (ResultSet res = stm.executeQuery()) {
+                while (res.next()) {
+                    Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    livros.add(livro);
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar ISBN", e);
@@ -128,10 +131,11 @@ public class LivroRepository {
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setInt(1, isbn);
-            res = stm.executeQuery();
 
-            while (res.next()) {
-                livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+            try (ResultSet res = stm.executeQuery()) {
+                while (res.next()) {
+                    livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar ISBN", e);
@@ -146,10 +150,11 @@ public class LivroRepository {
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
             stm.setInt(1, id);
-            res = stm.executeQuery();
 
-            if (res.next()) {
-                livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+            try (ResultSet res = stm.executeQuery()) {
+                if (res.next()) {
+                    livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar id", e);
@@ -159,16 +164,21 @@ public class LivroRepository {
     }
 
     public List<Livro> buscarPreco(double preco) {
+        double margem = preco * 0.15;
+        double minPreco = preco - margem;
+        double maxPreco = preco + margem;
         List<Livro> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE preco LIKE CONCAT('%', ?, '%')";
+        String sql = "SELECT * FROM livro WHERE preco BETWEEN ? AND ?";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setDouble(1, preco);
-            res = stm.executeQuery();
+            stm.setDouble(1, minPreco);
+            stm.setDouble(2, maxPreco);
 
-            while (res.next()) {
-                Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
-                livros.add(livro);
+            try (ResultSet res = stm.executeQuery()) {
+                while (res.next()) {
+                    Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    livros.add(livro);
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar livro por preço", e);
@@ -182,11 +192,12 @@ public class LivroRepository {
         String sql = "SELECT * FROM livro";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            res = stm.executeQuery();
 
-            while (res.next()) {
-                Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
-                livros.add(livro);
+            try (ResultSet res = stm.executeQuery()) {
+                while (res.next()) {
+                    Livro livro = new Livro(res.getInt("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    livros.add(livro);
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar livros", e);
@@ -199,10 +210,11 @@ public class LivroRepository {
         String sql = "SELECT EXISTS (SELECT 1 FROM livro)";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            res = stm.executeQuery();
 
-            if (res.next()) {
-                return !res.getBoolean(1);
+            try (ResultSet res = stm.executeQuery()) {
+                if (res.next()) {
+                    return !res.getBoolean(1);
+                }
             }
         } catch (SQLException e) {
             throw new ExcecoesLivro("Erro ao buscar livros", e);

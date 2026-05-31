@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface LivroServiceInterface {
     public Livro criarLivro(Livro livro);
 
-    public void delLivro(int isbn);
+    public String delLivro(int isbn);
 
     public List<Livro> getLivros();
 
