@@ -1,75 +1,133 @@
-# 📚 Projeto Livraria - Persistência com MySQL & JDBC
+# 📚 Projeto Livraria - API REST com Spring Boot & MySQL
 
-Este é um projeto de **estoque de livraria**, criado para consolidar conceitos avançados de **Programação Orientada a Objetos (POO)**, padrões de projetos e organização de sistemas em camadas.
+Este é um projeto de **gerenciamento de acervo de livraria**, desenvolvido para consolidar conceitos de **Arquitetura em Camadas**, **APIs RESTful** e persistência de dados.
 
-Originalmente projetado para operar em memória, o sistema agora conta com persistência real em banco de dados **MySQL**, utilizando as melhores práticas de segurança e performance.
-
----
-
-## 🏛 Arquitetura do Sistema
-
-O projeto adota uma **Arquitetura em Camadas (N-Tier Architecture)**. Essa escolha permite que o sistema seja modular e escalável. Graças ao baixo acoplamento, a transição da lógica de `ArrayList` para **MySQL** foi realizada sem impactar as regras de negócio ou a interface do usuário.
-
-
-
-### Divisão de Responsabilidades:
-
-1. **Camada de Apresentação (`cli`)**: Representa a interface com o usuário no terminal. Captura entradas e exibe resultados ou mensagens de erro.
-2. **Camada de Controle (`controller`)**: Atua como mediadora, recebendo chamadas da interface e direcionando-as para os serviços correspondentes.
-3. **Camada de Serviço/Negócio (`services`)**: O "cérebro" do sistema. Contém todas as regras de validação e lógica de negócio.
-4. **Camada de Persistência (`repository`)**: Gerencia a comunicação direta com o banco de dados via JDBC, executando comandos SQL otimizados.
-5. **Camada de Conexão (`connection`)**: Gerencia a abertura de conexões com o MySQL utilizando o padrão Singleton e variáveis de ambiente.
-6. **Domínio (`entity`)**: Contém as classes fundamentais (`LivroEntity`) que representam os objetos do mundo real.
-7. **Tratamento de Erros (`excecoes`)**: Exceções personalizadas para garantir que falhas técnicas do banco não cheguem "cruas" ao usuário final.
+Originalmente projetado como uma aplicação simples, o sistema foi evoluído para uma API robusta utilizando **Spring Boot**, com persistência real em banco de dados **MySQL** via JDBC, seguindo padrões profissionais de desenvolvimento para portfólios técnicos.
 
 ---
 
-## 🚀 Funcionalidades (CRUD Otimizado)
+## 🚀 Funcionalidades
 
-- **Create**: Adição de novos livros utilizando `PreparedStatement` para segurança contra SQL Injection.
-- **Read**:
-    - Busca inteligente por Título, Autor, ISBN ou Preço.
-    - Listagem completa de todos os registros.
-    - Verificação ultra-rápida de banco vazio utilizando `SELECT EXISTS`.
-- **Update**: Atualização completa de dados cadastrados no banco.
-- **Delete**: Remoção segura de registros através do ID/ISBN.
+A API disponibiliza diversos endpoints para o gerenciamento do acervo:
 
----
-
-## 🗂 Estrutura de Pacotes e Organização
-
-O projeto está organizado para garantir o baixo acoplamento:
-
-- **`cli`**: Interface de linha de comando para interação com o usuário.
-- **`connection`**: Lógica de conexão JDBC e leitura de variáveis via `.env`.
-- **`controller`**: Gerencia o fluxo entre a CLI e o Service.
-- **`entity`**: Classe `LivroEntity` com os atributos e estrutura do dado.
-- **`excecoes`**: Exceções personalizadas (`ExcecoesLivro`, `BuscaLivros`) para tratamento centralizado.
-- **`interfaces`**: Contém a `LivroInterface`, que define o contrato de métodos do sistema.
-- **`repository`**: Implementação das queries SQL e manipulação de `ResultSet`.
-- **`services`**: Implementação da interface, contendo validações e regras de negócio.
+- **Cadastro de Livros:** Adição de novos livros ao acervo com validação de unicidade (ISBN e combinação de Título + Autor).
+- **Listagem Completa:** Recuperação de todos os livros cadastrados.
+- **Buscas Específicas:**
+  - Por ID.
+  - Por Título (busca parcial).
+  - Por Autor (busca parcial).
+  - Por ISBN.
+  - Por faixa de Preço (com margem de 15% para mais ou para menos).
+- **Atualizações Parciais (PATCH):** Modificação individual de atributos do livro (Título, Autor, ISBN, Preço, Estoque e Data de Lançamento).
+- **Remoção:** Exclusão de livros do sistema pelo ID.
+- **Tratamento de Exceções:** Respostas HTTP adequadas (ex: 404 Not Found, 409 Conflict, 400 Bad Request) para regras de negócio e validações.
 
 ---
 
-## 🛠 Tecnologias Utilizadas
+## 🏗️ Arquitetura do Projeto
 
-- **Java** (Versão 17+)
-- **Maven**: Gerenciamento de dependências (MySQL Connector, Dotenv).
-- **MySQL**: Banco de dados relacional para persistência.
-- **Java-dotenv**: Proteção de credenciais de acesso ao banco via arquivo `.env`.
-- **Scanner / DateTimeFormatter**: Interação e formatação de datas.
+O projeto foi refatorado para utilizar o framework **Spring Boot** e segue uma arquitetura em camadas bem definida, garantindo separação de responsabilidades e facilidade de manutenção:
 
----
-
-## 📌 Próximos Passos
-
-- [x] Implementar persistência com **MySQL** (Substituindo a lógica de ArrayList no Repository).
-- [ ] Migrar interface para **Java Swing** (Adicionando uma nova camada de View Gráfica).
-- [ ] Criar testes automatizados para a camada de Service.
+- **Controller (`com.livrariaJava.controller`):** Responsável por expor os endpoints REST, receber as requisições HTTP, delegar o processamento para a camada de serviço e retornar as respostas adequadas (ResponseEntity).
+- **Service (`com.livrariaJava.services` e `com.livrariaJava.interfaces`):** Contém as regras de negócio da aplicação. Valida dados, verifica duplicidades e orquestra as chamadas ao repositório.
+- **Repository (`com.livrariaJava.repository`):** Camada de acesso a dados. Executa as operações de persistência diretamente no banco de dados utilizando JDBC (Java Database Connectivity).
+- **Entity (`com.livrariaJava.entity`):** Representa o modelo de domínio. A entidade `Livro` foi atualizada para utilizar classes wrapper (`Long`, `Integer`, `Double`) em vez de tipos primitivos, permitindo melhor tratamento de valores nulos e integração com APIs.
+- **Connection (`com.livrariaJava.connection`):** Gerencia a conexão com o banco de dados MySQL, utilizando variáveis de ambiente (via Dotenv) para proteger credenciais.
+- **Exceptions (`com.livrariaJava.excecoes`):** Classes customizadas para tratamento de erros específicos do domínio da aplicação.
 
 ---
 
-## 👨‍💻 Davi de Jesus
+## 🛠️ Tecnologias Utilizadas
 
-Projeto desenvolvido para estudos de arquitetura e boas práticas de desenvolvimento Java.
-Aberto a melhorias e sugestões!
+- **Java 17+**
+- **Spring Boot** (Framework principal)
+- **Spring Web** (Criação da API REST)
+- **Spring Boot DevTools** (Produtividade no desenvolvimento)
+- **MySQL** (Banco de Dados Relacional)
+- **JDBC** (Persistência de dados nativa)
+- **Dotenv (io.github.cdimascio.java-dotenv)** (Gerenciamento de variáveis de ambiente)
+
+---
+
+## 📦 Estrutura da Entidade Livro
+
+A entidade principal do sistema possui os seguintes atributos:
+
+| Atributo | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `id` | `Long` | Identificador único do livro no banco de dados. |
+| `titulo` | `String` | Título da obra. |
+| `autor` | `String` | Nome do autor do livro. |
+| `preco` | `Double` | Valor de venda do livro. |
+| `isbn` | `Integer` | Código de identificação único do livro. |
+| `estoque` | `Integer` | Quantidade de exemplares disponíveis. |
+| `lancamento` | `LocalDate` | Data de lançamento da obra. |
+
+---
+
+## 🔌 Endpoints da API
+
+A API base está mapeada em `/livraria`. Abaixo estão os principais endpoints disponíveis:
+
+### Criar e Listar
+- `POST /livraria/` - Adiciona um novo livro.
+- `GET /livraria/` - Retorna todos os livros.
+
+### Buscas
+- `GET /livraria/{id}` - Busca um livro pelo ID.
+- `GET /livraria/titulo?titulo={titulo}` - Busca livros por título.
+- `GET /livraria/autor?autor={autor}` - Busca livros por autor.
+- `GET /livraria/isbn?isbn={isbn}` - Busca livros por ISBN.
+- `GET /livraria/preco?preco={preco}` - Busca livros por faixa de preço.
+
+### Atualizações Parciais
+- `PATCH /livraria/{id}/titulo?titulo={novoTitulo}` - Atualiza o título.
+- `PATCH /livraria/{id}/autor?autor={novoAutor}` - Atualiza o autor.
+- `PATCH /livraria/{id}/isbn?isbn={novoIsbn}` - Atualiza o ISBN.
+- `PATCH /livraria/{id}/preco?preco={novoPreco}` - Atualiza o preço.
+- `PATCH /livraria/{id}/estoque?estoque={novoEstoque}` - Atualiza o estoque.
+- `PATCH /livraria/{id}/data?data={novaData}` - Atualiza a data de lançamento.
+
+### Remoção
+- `DELETE /livraria/{id}` - Remove um livro pelo ID.
+
+---
+
+## ⚙️ Como Executar o Projeto
+
+### Pré-requisitos
+- JDK 17 ou superior instalado.
+- Maven instalado.
+- Servidor MySQL rodando localmente ou em nuvem.
+
+### Configuração do Banco de Dados
+1. Crie um banco de dados no MySQL.
+2. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+   ```env
+   DB_URL=jdbc:mysql://localhost:3306/nome_do_seu_banco
+   DB_USER=seu_usuario
+   DB_PASSWORD=sua_senha
+   ```
+3. A tabela `livro` deve ser criada no banco de dados com a estrutura compatível com a entidade.
+
+### Executando a Aplicação
+1. Clone o repositório.
+2. Navegue até o diretório do projeto.
+3. Execute o comando Maven para iniciar a aplicação:
+   ```bash
+   mvn spring-boot:run
+   ```
+4. A API estará disponível em `http://localhost:8080/livraria/`.
+
+---
+
+## 🔮 Próximos Passos (Roadmap)
+
+- [ ] Implementar Spring Data JPA para simplificar a camada de persistência.
+- [ ] Adicionar documentação interativa com Swagger/OpenAPI.
+- [ ] Implementar testes unitários e de integração (JUnit e Mockito).
+- [ ] Adicionar paginação e ordenação nas listagens.
+- [ ] Implementar segurança com Spring Security e JWT.
+
+---
+*Desenvolvido com dedicação para aprender melhorar habilidades em Java e Spring Boot.*
