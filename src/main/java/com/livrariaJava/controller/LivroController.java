@@ -37,7 +37,7 @@ public class LivroController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> mostarLivros() {
         try {
             List<Livro> l = this.service.getLivros();
