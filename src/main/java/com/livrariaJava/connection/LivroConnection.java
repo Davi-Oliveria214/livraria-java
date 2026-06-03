@@ -24,6 +24,6 @@ public class LivroConnection {
 
     public Connection connection() throws SQLException {
         Connection conn;
-        return conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        return conn = DriverManager.getConnection(URL,USER,PASSWORD);
     }
 }

@@ -201,7 +201,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar livros", e);
+            throw new ExcecoesLivro("Erro ao buscar livros " + e, e);
         }
 
         return livros;
@@ -218,7 +218,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar livros", e);
+            throw new ExcecoesLivro("Erro ao buscar livros " + e, e);
         }
 
         return true;
