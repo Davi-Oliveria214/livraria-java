@@ -1,5 +1,7 @@
 package com.livrariaJava.connection;
 
+import com.livrariaJava.config.AppConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -8,19 +10,13 @@ import java.sql.SQLException;
 
 @Component
 public class LivroConnection {
+    private final AppConfig appConfig;
 
-    private final String URL;
-    private final String USER;
-    private final String PASSWORD;
-
-    public LivroConnection() {
-        this.URL = System.getenv("DB_URL");
-        this.USER = System.getenv("DB_USER");
-        this.PASSWORD = System.getenv("DB_PASSWORD");
+    public LivroConnection(AppConfig appConfig) {
+        this.appConfig = appConfig;
     }
 
     public Connection connection() throws SQLException {
-        Connection conn;
-        return conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        return DriverManager.getConnection(appConfig.getDb_url(), appConfig.getDb_user(), appConfig.getDb_password());
     }
 }
