@@ -1,6 +1,5 @@
 package com.livrariaJava.connection;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -15,7 +14,6 @@ public class LivroConnection {
     private final String PASSWORD;
 
     public LivroConnection() {
-        Dotenv dotEnv = Dotenv.load();
 
         this.URL = System.getenv("DB_URL");
         this.USER = System.getenv("DB_USER");
