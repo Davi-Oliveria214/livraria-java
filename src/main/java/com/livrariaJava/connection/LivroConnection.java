@@ -17,9 +17,9 @@ public class LivroConnection {
     public LivroConnection() {
         Dotenv dotEnv = Dotenv.load();
 
-        this.URL = dotEnv.get("DB_URL");
-        this.USER = dotEnv.get("DB_USER");
-        this.PASSWORD = dotEnv.get("DB_PASSWORD");
+        this.URL = System.getenv("DB_URL");
+        this.USER = System.getenv("DB_USER");
+        this.PASSWORD = System.getenv("DB_PASSWORD");
     }
 
     public Connection connection() throws SQLException {
