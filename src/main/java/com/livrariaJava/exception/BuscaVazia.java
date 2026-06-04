@@ -1,6 +1,6 @@
-package com.livrariaJava.excecoes;
+package com.livrariaJava.exception;
 
-public class BuscaVazia extends ExcecoesLivro {
+public class BuscaVazia extends RuntimeException {
     public BuscaVazia() {
         super("Nenhum Livro encontrado");
     }

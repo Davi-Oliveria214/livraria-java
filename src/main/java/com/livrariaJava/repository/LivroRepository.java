@@ -2,7 +2,7 @@ package com.livrariaJava.repository;
 
 import com.livrariaJava.connection.LivroConnection;
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.excecoes.ExcecoesLivro;
+import com.livrariaJava.exception.LivroExcecao;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -31,7 +31,7 @@ public class LivroRepository {
             stm.executeUpdate();
             return livro;
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao adicionar livro", e);
+            throw new LivroExcecao("Erro ao adicionar livro");
         }
     }
 
@@ -42,7 +42,7 @@ public class LivroRepository {
             stm.setLong(1, id);
             stm.executeUpdate();
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao apagar livro", e);
+            throw new LivroExcecao("Erro ao apagar livro");
         }
     }
 
@@ -61,7 +61,7 @@ public class LivroRepository {
 
             return buscarId(livro.getId());
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao atualizar o livro", e);
+            throw new LivroExcecao("Erro ao atualizar o livro");
         }
     }
 
@@ -77,7 +77,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar histórico de criação", e);
+            throw new LivroExcecao("Erro ao buscar histórico de criação");
         }
 
         return livros;
@@ -97,7 +97,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar titulo", e);
+            throw new LivroExcecao("Erro ao buscar titulo");
         }
 
         return livros;
@@ -117,7 +117,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar autor", e);
+            throw new LivroExcecao("Erro ao buscar autor");
         }
 
         return livros;
@@ -137,7 +137,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar ISBN", e);
+            throw new LivroExcecao("Erro ao buscar ISBN");
         }
 
         return livros;
@@ -156,7 +156,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar ISBN", e);
+            throw new LivroExcecao("Erro ao buscar ISBN");
         }
 
         return livro;
@@ -175,7 +175,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar id", e);
+            throw new LivroExcecao("Erro ao buscar id");
         }
 
         return livro;
@@ -199,7 +199,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar livro por preço", e);
+            throw new LivroExcecao("Erro ao buscar livro por preço");
         }
 
         return livros;
@@ -218,7 +218,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar livros", e);
+            throw new LivroExcecao("Erro ao buscar livros");
         }
 
         return livros;
@@ -228,14 +228,13 @@ public class LivroRepository {
         String sql = "SELECT EXISTS (SELECT 1 FROM livro)";
 
         try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-
             try (ResultSet res = stm.executeQuery()) {
                 if (res.next()) {
                     return !res.getBoolean(1);
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar livros", e);
+            throw new LivroExcecao("Erro ao buscar livros");
         }
 
         return true;

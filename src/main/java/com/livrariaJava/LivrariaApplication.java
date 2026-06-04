@@ -7,8 +7,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties(AppConfig.class)
-public class LivrariaAplication {
+public class LivrariaApplication {
     public static void main(String[] args) {
-        SpringApplication.run(LivrariaAplication.class, args);
+        SpringApplication.run(LivrariaApplication.class, args);
     }
 }

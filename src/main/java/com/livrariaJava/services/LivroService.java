@@ -1,8 +1,8 @@
 package com.livrariaJava.services;
 
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.excecoes.BuscaVazia;
-import com.livrariaJava.excecoes.ExcecoesLivro;
+import com.livrariaJava.exception.BuscaVazia;
+import com.livrariaJava.exception.LivroExcecao;
 import com.livrariaJava.interfaces.LivroServiceInterface;
 import com.livrariaJava.repository.LivroRepository;
 import org.springframework.stereotype.Service;
@@ -14,22 +14,22 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class LivroServiceService implements LivroServiceInterface {
+public class LivroService implements LivroServiceInterface {
     private final LivroRepository repository;
 
-    public LivroServiceService(LivroRepository livroRepository) {
+    public LivroService(LivroRepository livroRepository) {
         this.repository = livroRepository;
     }
 
     @Override
-    public Livro criarLivro(Livro livro) throws ExcecoesLivro {
+    public Livro criarLivro(Livro livro) {
         Optional.ofNullable(this.repository.buscarExataISBN(livro.getIsbn())).ifPresent(l -> {
-            throw new ExcecoesLivro("Essa ISBN já está cadastrada");
+            throw new LivroExcecao("Essa ISBN já está cadastrada");
         });
 
         for (Livro l : this.repository.buscarTitulo(livro.getTitulo())) {
             if (Objects.equals(l.getTitulo(), livro.getTitulo()) && Objects.equals(l.getAutor(), livro.getAutor())) {
-                throw new ExcecoesLivro("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
+                throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
             }
         }
 
@@ -37,7 +37,7 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public String delLivro(Long id) throws ExcecoesLivro {
+    public String delLivro(Long id) {
         Livro livro = this.buscarId(id);
 
         this.repository.delLivro(id);
@@ -45,7 +45,7 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public List<Livro> getLivros() throws ExcecoesLivro {
+    public List<Livro> getLivros() {
         this.verificar();
 
         return this.repository.todosLivros();
@@ -59,40 +59,40 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public List<Livro> buscarTitulo(String titulo) throws ExcecoesLivro {
+    public Livro buscarId(Long id) {
+        return Optional.ofNullable(this.repository.buscarId(id)).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com o ID: " + id));
+    }
+
+    @Override
+    public List<Livro> buscarTitulo(String titulo) {
         this.verificar();
 
         return Optional.ofNullable(this.repository.buscarTitulo(titulo)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado"));
     }
 
     @Override
-    public List<Livro> buscarISBN(Integer isbn) throws ExcecoesLivro {
+    public List<Livro> buscarISBN(Integer isbn) {
         this.verificar();
 
         return Optional.ofNullable(this.repository.buscarISBN(isbn)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro com a ISBN: " + isbn + ", encontrado"));
     }
 
     @Override
-    public Livro buscarId(Long id) throws ExcecoesLivro {
-        return Optional.ofNullable(this.repository.buscarId(id)).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado"));
-    }
-
-    @Override
-    public List<Livro> buscarAutor(String autor) throws ExcecoesLivro {
+    public List<Livro> buscarAutor(String autor) {
         this.verificar();
 
         return Optional.ofNullable(this.repository.buscarAutor(autor)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum autor com esse nome encontrado: " + autor));
     }
 
     @Override
-    public List<Livro> buscarPreco(Double preco) throws ExcecoesLivro {
+    public List<Livro> buscarPreco(Double preco) {
         this.verificar();
 
         return Optional.ofNullable(this.repository.buscarPreco(preco)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com esse preço: " + preco));
     }
 
     @Override
-    public Livro altTitulo(Long id, String novoTitulo) throws ExcecoesLivro {
+    public Livro altTitulo(Long id, String novoTitulo) {
         this.verificar();
 
         Livro livro = this.buscarId(id);
@@ -102,7 +102,7 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro altAutor(Long id, String novoAutor) throws ExcecoesLivro {
+    public Livro altAutor(Long id, String novoAutor) {
         this.verificar();
 
         Livro livro = this.buscarId(id);
@@ -112,7 +112,7 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro altPreco(Long id, Double novoPreco) throws ExcecoesLivro {
+    public Livro altPreco(Long id, Double novoPreco) {
         this.verificar();
 
         Livro livro = this.buscarId(id);
@@ -122,7 +122,7 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro altEstoque(Long id, Integer novoEstoque) throws ExcecoesLivro {
+    public Livro altEstoque(Long id, Integer novoEstoque) {
         this.verificar();
 
         Livro livro = this.buscarId(id);
@@ -132,7 +132,7 @@ public class LivroServiceService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro altISBN(Long id, Integer novaISBN) throws ExcecoesLivro {
+    public Livro altISBN(Long id, Integer novaISBN) {
         this.verificar();
 
         Livro livro = this.buscarId(id);
@@ -151,7 +151,7 @@ public class LivroServiceService implements LivroServiceInterface {
         return this.repository.updateLivro(livro);
     }
 
-    public void verificar() throws ExcecoesLivro {
+    public void verificar() {
         if (this.repository.isTabelaVazia()) {
             throw new BuscaVazia("Nenhum livro cadastrado");
         }

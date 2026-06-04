@@ -33,7 +33,7 @@ O projeto foi refatorado para utilizar o framework **Spring Boot** e segue uma a
 - **Repository (`com.livrariaJava.repository`):** Camada de acesso a dados. Executa as operações de persistência diretamente no banco de dados utilizando JDBC (Java Database Connectivity).
 - **Entity (`com.livrariaJava.entity`):** Representa o modelo de domínio. A entidade `Livro` foi atualizada para utilizar classes wrapper (`Long`, `Integer`, `Double`) em vez de tipos primitivos, permitindo melhor tratamento de valores nulos e integração com APIs.
 - **Connection (`com.livrariaJava.connection`):** Gerencia a conexão com o banco de dados MySQL, utilizando variáveis de ambiente (via Dotenv) para proteger credenciais.
-- **Exceptions (`com.livrariaJava.excecoes`):** Classes customizadas para tratamento de erros específicos do domínio da aplicação.
+- **Exceptions (`com.livrariaJava.exception`):** Classes customizadas para tratamento de erros específicos do domínio da aplicação.
 
 ---
 
