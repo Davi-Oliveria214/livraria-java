@@ -1,5 +1,6 @@
 package com.livrariaJava.entity;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 
 public class Livro {
@@ -10,21 +11,13 @@ public class Livro {
     private Integer isbn;
     private Integer estoque;
     private LocalDate lancamento;
+    private Timestamp criado_em;
 
     public Livro() {
 
     }
 
-    public Livro(String titulo, String autor, Double preco, Integer isbn, Integer estoque, LocalDate lancamento) {
-        this.titulo = titulo;
-        this.autor = autor;
-        this.preco = preco;
-        this.isbn = isbn;
-        this.estoque = estoque;
-        this.lancamento = lancamento;
-    }
-
-    public Livro(Long id, String titulo, String autor, Double preco, Integer isbn, Integer estoque, LocalDate lancamento) {
+    public Livro(Long id, String titulo, String autor, Double preco, Integer isbn, Integer estoque, LocalDate lancamento, Timestamp criado_em) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
@@ -32,6 +25,7 @@ public class Livro {
         this.isbn = isbn;
         this.estoque = estoque;
         this.lancamento = lancamento;
+        this.criado_em = criado_em;
     }
 
     public Long getId() {
@@ -84,6 +78,14 @@ public class Livro {
 
     public void setLancamento(LocalDate lancamento) {
         this.lancamento = lancamento;
+    }
+
+    public Timestamp getCriado_em() {
+        return criado_em;
+    }
+
+    public void setCriado_em(Timestamp criado_em) {
+        this.criado_em = criado_em;
     }
 
     @Override

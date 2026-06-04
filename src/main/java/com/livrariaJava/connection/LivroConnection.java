@@ -14,7 +14,6 @@ public class LivroConnection {
     private final String PASSWORD;
 
     public LivroConnection() {
-
         this.URL = System.getenv("DB_URL");
         this.USER = System.getenv("DB_USER");
         this.PASSWORD = System.getenv("DB_PASSWORD");
@@ -22,6 +21,6 @@ public class LivroConnection {
 
     public Connection connection() throws SQLException {
         Connection conn;
-        return conn = DriverManager.getConnection(URL,USER,PASSWORD);
+        return conn = DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

@@ -2,6 +2,7 @@ package com.livrariaJava.interfaces;
 
 import com.livrariaJava.entity.Livro;
 import java.time.LocalDate;
+import java.util.Deque;
 import java.util.List;
 
 public interface LivroServiceInterface {
@@ -11,11 +12,13 @@ public interface LivroServiceInterface {
 
     public List<Livro> getLivros();
 
+    public Deque<Livro> historico();
+
+    public Livro buscarId(Long id);
+
     public List<Livro> buscarTitulo(String titulo);
 
     public List<Livro> buscarISBN(Integer isbn);
-
-    public Livro buscarId(Long id);
 
     public List<Livro> buscarAutor(String autor);
 

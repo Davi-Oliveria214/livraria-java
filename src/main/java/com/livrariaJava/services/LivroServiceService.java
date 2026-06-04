@@ -8,6 +8,7 @@ import com.livrariaJava.repository.LivroRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,6 +49,13 @@ public class LivroServiceService implements LivroServiceInterface {
         this.verificar();
 
         return this.repository.todosLivros();
+    }
+
+    @Override
+    public Deque<Livro> historico() {
+        this.verificar();
+
+        return this.repository.historicoLivro();
     }
 
     @Override

@@ -5,10 +5,9 @@ import com.livrariaJava.entity.Livro;
 import com.livrariaJava.excecoes.ExcecoesLivro;
 import org.springframework.stereotype.Repository;
 
-import javax.xml.transform.Result;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
 
 @Repository
 public class LivroRepository {
@@ -66,6 +65,24 @@ public class LivroRepository {
         }
     }
 
+    public Deque<Livro> historicoLivro() {
+        Deque<Livro> livros = new ArrayDeque<>();
+        String sql = "SELECT * FROM livro ORDER BY criado_em DESC";
+
+        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
+            try (ResultSet res = stm.executeQuery()) {
+                while (res.next()) {
+                    Livro l = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
+                    livros.addFirst(l);
+                }
+            }
+        } catch (SQLException e) {
+            throw new ExcecoesLivro("Erro ao buscar histórico de criação", e);
+        }
+
+        return livros;
+    }
+
     public List<Livro> buscarTitulo(String titulo) {
         List<Livro> livros = new ArrayList<>();
         String sql = "SELECT * FROM livro WHERE titulo LIKE CONCAT('%', ?, '%')";
@@ -75,7 +92,7 @@ public class LivroRepository {
 
             try (ResultSet res = stm.executeQuery()) {
                 while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
                     livros.add(livro);
                 }
             }
@@ -95,7 +112,7 @@ public class LivroRepository {
 
             try (ResultSet res = stm.executeQuery()) {
                 while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
                     livros.add(livro);
                 }
             }
@@ -115,7 +132,7 @@ public class LivroRepository {
 
             try (ResultSet res = stm.executeQuery()) {
                 while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
                     livros.add(livro);
                 }
             }
@@ -135,7 +152,7 @@ public class LivroRepository {
 
             try (ResultSet res = stm.executeQuery()) {
                 while (res.next()) {
-                    livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
                 }
             }
         } catch (SQLException e) {
@@ -154,7 +171,7 @@ public class LivroRepository {
 
             try (ResultSet res = stm.executeQuery()) {
                 if (res.next()) {
-                    livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
                 }
             }
         } catch (SQLException e) {
@@ -177,7 +194,7 @@ public class LivroRepository {
 
             try (ResultSet res = stm.executeQuery()) {
                 while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
                     livros.add(livro);
                 }
             }
@@ -196,12 +213,12 @@ public class LivroRepository {
 
             try (ResultSet res = stm.executeQuery()) {
                 while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate());
+                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
                     livros.add(livro);
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar livros " + e, e);
+            throw new ExcecoesLivro("Erro ao buscar livros", e);
         }
 
         return livros;
@@ -218,7 +235,7 @@ public class LivroRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new ExcecoesLivro("Erro ao buscar livros " + e, e);
+            throw new ExcecoesLivro("Erro ao buscar livros", e);
         }
 
         return true;
