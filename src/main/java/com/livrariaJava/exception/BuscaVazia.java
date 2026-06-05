@@ -1,11 +1,13 @@
 package com.livrariaJava.exception;
 
-public class BuscaVazia extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class BuscaVazia extends LivroExcecao {
     public BuscaVazia() {
-        super("Nenhum Livro encontrado");
+        super("Nenhum Livro encontrado", HttpStatus.NOT_FOUND);
     }
 
     public BuscaVazia(String mensagem) {
-        super(mensagem);
+        super(mensagem, HttpStatus.NOT_FOUND);
     }
 }

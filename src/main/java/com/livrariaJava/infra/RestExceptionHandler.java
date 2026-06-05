@@ -8,41 +8,37 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
-
 @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BuscaVazia.class)
     private ResponseEntity<Object> livroNaoEncontrado(BuscaVazia buscaVazia) {
-        MessageErrorGlobal global = new MessageErrorGlobal();
-        global.mensagem("timestamp", LocalDateTime.now());
-        global.mensagem("status", HttpStatus.NOT_FOUND);
-        global.mensagem("error", "Recurso não encontrado");
-        global.mensagem("message", buscaVazia.getMessage());
-
-        return ResponseEntity.status(404).body(global.getBody());
+        BodyGlobalError body = createBodyHandler(buscaVazia);
+        return ResponseEntity.status(body.getStatus()).body(body);
     }
 
     @ExceptionHandler(LivroExcecao.class)
     private ResponseEntity<Object> livroExistente(LivroExcecao livroExcecao) {
-        MessageErrorGlobal global = new MessageErrorGlobal();
-        global.mensagem("timestamp", LocalDateTime.now());
-        global.mensagem("status", HttpStatus.CONFLICT);
-        global.mensagem("error", "Recurso existente");
-        global.mensagem("message", livroExcecao.getMessage());
-
-        return ResponseEntity.status(409).body(global.getBody());
+        BodyGlobalError body = createBodyHandler(livroExcecao);
+        return ResponseEntity.status(body.getStatus()).body(body);
     }
 
     @ExceptionHandler(Exception.class)
     private ResponseEntity<Object> erroGenerico(Exception exception) {
-        MessageErrorGlobal global = new MessageErrorGlobal();
-        global.mensagem("timestamp", LocalDateTime.now());
-        global.mensagem("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        global.mensagem("error", "Erro interno no Servidor");
-        global.mensagem("message", exception.getMessage());
+        BodyGlobalError global = new BodyGlobalError();
+        global.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        global.setError(global.getStatus().name());
+        global.setMessage(exception.getMessage());
 
-        return ResponseEntity.status(500).body(global.getBody());
+        return ResponseEntity.status(global.getStatus()).body(global);
+    }
+
+    private BodyGlobalError createBodyHandler(LivroExcecao e) {
+        BodyGlobalError global = new BodyGlobalError();
+        global.setStatus(e.getStatus());
+        global.setError(global.statusName());
+        global.setMessage(e.getMessage());
+
+        return global;
     }
 }

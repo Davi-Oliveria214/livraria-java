@@ -5,6 +5,7 @@ import com.livrariaJava.exception.BuscaVazia;
 import com.livrariaJava.exception.LivroExcecao;
 import com.livrariaJava.interfaces.LivroServiceInterface;
 import com.livrariaJava.repository.LivroRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,12 +25,13 @@ public class LivroService implements LivroServiceInterface {
     @Override
     public Livro criarLivro(Livro livro) {
         Optional.ofNullable(this.repository.buscarExataISBN(livro.getIsbn())).ifPresent(l -> {
-            throw new LivroExcecao("Essa ISBN já está cadastrada");
+            throw new LivroExcecao("Essa ISBN já está cadastrada", HttpStatus.CONFLICT);
         });
 
         for (Livro l : this.repository.buscarTitulo(livro.getTitulo())) {
             if (Objects.equals(l.getTitulo(), livro.getTitulo()) && Objects.equals(l.getAutor(), livro.getAutor())) {
-                throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado");
+                throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
+                        HttpStatus.CONFLICT);
             }
         }
 
@@ -67,7 +69,7 @@ public class LivroService implements LivroServiceInterface {
     public List<Livro> buscarTitulo(String titulo) {
         this.verificar();
 
-        return Optional.ofNullable(this.repository.buscarTitulo(titulo)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado"));
+        return Optional.ofNullable(this.repository.buscarTitulo(titulo)).filter(l -> !l.isEmpty()).orElseThrow(BuscaVazia::new);
     }
 
     @Override
