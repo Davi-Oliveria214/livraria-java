@@ -3,7 +3,6 @@ package com.livrariaJava.repository;
 import com.livrariaJava.connection.LivroConnection;
 import com.livrariaJava.entity.Livro;
 import com.livrariaJava.exception.LivroExcecao;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;

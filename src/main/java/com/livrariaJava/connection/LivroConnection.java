@@ -1,7 +1,6 @@
 package com.livrariaJava.connection;
 
 import com.livrariaJava.config.AppConfig;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;

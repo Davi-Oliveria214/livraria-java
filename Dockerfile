@@ -1,15 +1,20 @@
-FROM ubuntu:latest AS build
+# Maven
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
-COPY . .
+WORKDIR /app
 
-RUN apt-get install maven -y
+COPY pom.xml .
+COPY src ./src
+
 RUN mvn clean install
 
-FROM eclipse-temurin:17-jre
+# Java
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+COPY --from=build /app/target/livraria-java-2.2-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-COPY --from=build /target/livraria-java-2.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
