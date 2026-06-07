@@ -1,242 +1,131 @@
 package com.livrariaJava.repository;
 
-import com.livrariaJava.connection.LivroConnection;
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.exception.LivroExcecao;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 
 @Repository
 public class LivroRepository {
-    private final LivroConnection conn;
+    private final NamedParameterJdbcTemplate conn;
 
-    public LivroRepository(LivroConnection livroConnection) {
+    public LivroRepository(NamedParameterJdbcTemplate livroConnection) {
         this.conn = livroConnection;
     }
 
     public Livro newLivro(Livro livro) {
-        String sql = "INSERT INTO livro(titulo, autor, isbn, preco, estoque, lancamento) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO livro(titulo, autor, isbn, preco, estoque, lancamento) VALUES (:titulo, :autor, :isbn, :preco, :estoque, :lancamento)";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setString(1, livro.getTitulo());
-            stm.setString(2, livro.getAutor());
-            stm.setInt(3, livro.getIsbn());
-            stm.setDouble(4, livro.getPreco());
-            stm.setInt(5, livro.getEstoque());
-            stm.setDate(6, Date.valueOf(livro.getLancamento()));
+        KeyHolder key = new GeneratedKeyHolder();
+        SqlParameterSource params = new BeanPropertySqlParameterSource(livro);
 
-            stm.executeUpdate();
-            return livro;
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao adicionar livro");
-        }
+        this.conn.update(sql, params, key);
+        return livro;
     }
 
     public void delLivro(Long id) {
-        String sql = "DELETE FROM livro WHERE id = ?";
+        String sql = "DELETE FROM livro WHERE id = :id";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setLong(1, id);
-            stm.executeUpdate();
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao apagar livro");
-        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+
+        this.conn.update(sql, map);
     }
 
     public Livro updateLivro(Livro livro) {
-        String sql = "UPDATE livro SET titulo = ?, autor = ?, isbn = ?, preco = ?, estoque = ?, lancamento = ? WHERE id = ?";
+        String sql = "UPDATE livro SET titulo = :titulo, autor = :autor, isbn = :isbn, preco = :preco, estoque = :estoque, lancamento = :lancamento WHERE id = :id";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setString(1, livro.getTitulo());
-            stm.setString(2, livro.getAutor());
-            stm.setInt(3, livro.getIsbn());
-            stm.setDouble(4, livro.getPreco());
-            stm.setInt(5, livro.getEstoque());
-            stm.setDate(6, Date.valueOf(livro.getLancamento()));
-            stm.setLong(7, livro.getId());
-            stm.executeUpdate();
+        this.conn.update(sql, new BeanPropertySqlParameterSource(livro));
 
-            return buscarId(livro.getId());
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao atualizar o livro");
-        }
+        return livro;
     }
 
-    public Deque<Livro> historicoLivro() {
-        Deque<Livro> livros = new ArrayDeque<>();
+    public List<Livro> historicoLivro() {
         String sql = "SELECT * FROM livro ORDER BY criado_em DESC";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            try (ResultSet res = stm.executeQuery()) {
-                while (res.next()) {
-                    Livro l = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                    livros.addFirst(l);
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar histórico de criação");
-        }
+        return this.conn.query(sql, mapear());
+    }
 
-        return livros;
+    public List<Livro> todosLivros() {
+        String sql = "SELECT * FROM livro";
+
+        return this.conn.query(sql, mapear());
+    }
+
+    public Livro buscarId(Number id) {
+        String sql = "SELECT * FROM livro WHERE id = :id";
+
+        List<Livro> l = this.conn.query(sql, params("id", id), mapear());
+
+        return (!l.isEmpty()) ? l.get(0) : null;
+    }
+
+    public Livro buscarExataIsbn(Integer isbn) {
+        String sql = "SELECT * FROM livro WHERE isbn = :isbn";
+
+        List<Livro> l = this.conn.query(sql, params("isbn", isbn), mapear());
+        return (!l.isEmpty()) ? l.get(0) : null;
+    }
+
+    public List<Livro> buscarIsbn(Integer isbn) {
+        String sql = "SELECT * FROM livro WHERE isbn::text LIKE CONCAT('%', :isbn, '%')";
+
+        return this.conn.query(sql, params("isbn", isbn), mapear());
     }
 
     public List<Livro> buscarTitulo(String titulo) {
-        List<Livro> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE titulo LIKE CONCAT('%', ?, '%')";
+        String sql = "SELECT * FROM livro WHERE titulo LIKE CONCAT('%', :titulo, '%')";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setString(1, titulo);
-
-            try (ResultSet res = stm.executeQuery()) {
-                while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                    livros.add(livro);
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar titulo");
-        }
-
-        return livros;
+        return this.conn.query(sql, params("titulo", titulo), mapear());
     }
 
     public List<Livro> buscarAutor(String autor) {
-        List<Livro> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE autor LIKE CONCAT('%', ?, '%')";
+        String sql = "SELECT * FROM livro WHERE autor LIKE CONCAT('%', :autor, '%')";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setString(1, autor);
-
-            try (ResultSet res = stm.executeQuery()) {
-                while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                    livros.add(livro);
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar autor");
-        }
-
-        return livros;
+        return this.conn.query(sql, params("autor", autor), mapear());
     }
 
-    public List<Livro> buscarISBN(Integer isbn) {
-        List<Livro> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE isbn LIKE CONCAT('%', ?, '%')";
+    public List<Livro> buscarLancamento(List<LocalDate> datas) {
+        String sql = "SELECT * FROM livro WHERE lancamento BETWEEN :inicio AND :fim";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setInt(1, isbn);
-
-            try (ResultSet res = stm.executeQuery()) {
-                while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                    livros.add(livro);
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar ISBN");
-        }
-
-        return livros;
-    }
-
-    public Livro buscarExataISBN(Integer isbn) {
-        Livro livro = null;
-        String sql = "SELECT * FROM livro WHERE isbn = ?";
-
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setInt(1, isbn);
-
-            try (ResultSet res = stm.executeQuery()) {
-                while (res.next()) {
-                    livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar ISBN");
-        }
-
-        return livro;
-    }
-
-    public Livro buscarId(Long id) {
-        Livro livro = null;
-        String sql = "SELECT * FROM livro WHERE id = ?";
-
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setLong(1, id);
-
-            try (ResultSet res = stm.executeQuery()) {
-                if (res.next()) {
-                    livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar id");
-        }
-
-        return livro;
+        Map<String, Object> map = new HashMap<>();
+        map.put("inicio", datas.get(0));
+        map.put("fim", datas.get(1));
+        return this.conn.query(sql, map, mapear());
     }
 
     public List<Livro> buscarPreco(Double preco) {
         double margem = preco * 0.15;
         double minPreco = preco - margem;
         double maxPreco = preco + margem;
-        List<Livro> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro WHERE preco BETWEEN ? AND ?";
+        String sql = "SELECT * FROM livro WHERE preco BETWEEN :min AND :max";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            stm.setDouble(1, minPreco);
-            stm.setDouble(2, maxPreco);
-
-            try (ResultSet res = stm.executeQuery()) {
-                while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                    livros.add(livro);
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar livro por preço");
-        }
-
-        return livros;
-    }
-
-    public List<Livro> todosLivros() {
-        List<Livro> livros = new ArrayList<>();
-        String sql = "SELECT * FROM livro";
-
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-
-            try (ResultSet res = stm.executeQuery()) {
-                while (res.next()) {
-                    Livro livro = new Livro(res.getLong("id"), res.getString("titulo"), res.getString("autor"), res.getDouble("preco"), res.getInt("isbn"), res.getInt("estoque"), res.getDate("lancamento").toLocalDate(), res.getTimestamp("criado_em"));
-                    livros.add(livro);
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar livros");
-        }
-
-        return livros;
+        Map<String, Object> map = new HashMap<>();
+        map.put("min", minPreco);
+        map.put("max", maxPreco);
+        return this.conn.query(sql, map, mapear());
     }
 
     public boolean isTabelaVazia() {
         String sql = "SELECT EXISTS (SELECT 1 FROM livro)";
 
-        try (PreparedStatement stm = conn.connection().prepareStatement(sql)) {
-            try (ResultSet res = stm.executeQuery()) {
-                if (res.next()) {
-                    return !res.getBoolean(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new LivroExcecao("Erro ao buscar livros");
-        }
+        return this.conn.query(sql, mapear()).isEmpty();
+    }
 
-        return true;
+    private SqlParameterSource params(String tipo, Object valor) {
+        return new MapSqlParameterSource().addValue(tipo, valor);
+    }
+
+    private BeanPropertyRowMapper<Livro> mapear() {
+        return new BeanPropertyRowMapper<>(Livro.class);
     }
 }

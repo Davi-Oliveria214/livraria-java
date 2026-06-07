@@ -2,6 +2,7 @@ package com.livrariaJava.infra;
 
 import com.livrariaJava.exception.BuscaVazia;
 import com.livrariaJava.exception.LivroExcecao;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,5 +41,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         global.setMessage(e.getMessage());
 
         return global;
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    private ResponseEntity<Object> createBodyHandler(EmptyResultDataAccessException e) {
+        BodyGlobalError global = new BodyGlobalError();
+        global.setStatus(HttpStatus.NOT_FOUND);
+        global.setError(global.getStatus().name());
+        global.setMessage(new BuscaVazia().getMessage());
+
+        return ResponseEntity.status(global.getStatus()).body(global);
     }
 }

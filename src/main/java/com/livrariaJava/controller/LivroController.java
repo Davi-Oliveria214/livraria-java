@@ -4,6 +4,7 @@ import com.livrariaJava.entity.Livro;
 import com.livrariaJava.services.LivroService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDate;
 
 @RestController
@@ -15,8 +16,8 @@ public class LivroController {
         this.service = livroService;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> addLivro(@RequestBody Livro livro) {
+    @PostMapping
+    public ResponseEntity<Livro> addLivro(@RequestBody Livro livro) {
         return ResponseEntity.status(201).body(this.service.criarLivro(livro));
     }
 
@@ -25,39 +26,24 @@ public class LivroController {
         return ResponseEntity.status(200).body(this.service.delLivro(id));
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> mostarLivros() {
         return ResponseEntity.ok(this.service.getLivros());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarId(@PathVariable Long id) {
+    public ResponseEntity<Livro> buscarId(@PathVariable("id") Long id) {
         return ResponseEntity.status(200).body(this.service.buscarId(id));
+    }
+
+    @GetMapping("/filtro/{filtro}")
+    public ResponseEntity<?> busca(@PathVariable("filtro") String filtro, @RequestParam("valor") String valor){
+        return ResponseEntity.status(200).body(this.service.busca(filtro, valor));
     }
 
     @GetMapping("/historico")
     public ResponseEntity<?> historico() {
         return ResponseEntity.status(200).body(this.service.historico());
-    }
-
-    @GetMapping("/titulo")
-    public ResponseEntity<?> buscarTitulo(@RequestParam("titulo") String titulo) {
-        return ResponseEntity.status(200).body(this.service.buscarTitulo(titulo));
-    }
-
-    @GetMapping("/isbn")
-    public ResponseEntity<?> buscarISBN(@RequestParam("isbn") Integer isbn) {
-        return ResponseEntity.status(200).body(this.service.buscarISBN(isbn));
-    }
-
-    @GetMapping("/autor")
-    public ResponseEntity<?> buscarAutor(@RequestParam("autor") String autor) {
-        return ResponseEntity.status(200).body(this.service.buscarAutor(autor));
-    }
-
-    @GetMapping("/preco")
-    public ResponseEntity<?> buscarPreco(@RequestParam("preco") Double preco) {
-        return ResponseEntity.status(200).body(this.service.buscarPreco(preco));
     }
 
     @PatchMapping("/{id}/titulo")

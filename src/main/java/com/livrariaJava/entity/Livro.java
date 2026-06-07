@@ -32,6 +32,10 @@ public class Livro {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getTitulo() {
         return titulo;
     }
@@ -92,12 +96,12 @@ public class Livro {
     public String toString() {
         return "Livro{" +
                 "ID: " + id +
-                ", Titulo='" + titulo + '\'' +
-                ", Autor='" + autor + '\'' +
-                ", Preço=" + preco +
-                ", ISBN=" + isbn +
-                ", Estoque=" + estoque +
-                ", Lançamento=" + lancamento +
-                '}';
+                ", Titulo: " + titulo +
+                ", Autor: " + autor +
+                ", Preço: " + preco +
+                ", ISBN: " + isbn +
+                ", Estoque: " + estoque +
+                ", Lançamento: " + lancamento +
+                "}";
     }
 }

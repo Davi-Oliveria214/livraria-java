@@ -12,17 +12,11 @@ public interface LivroServiceInterface {
 
     public List<Livro> getLivros();
 
-    public Deque<Livro> historico();
+    public List<Livro> historico();
 
     public Livro buscarId(Long id);
 
-    public List<Livro> buscarTitulo(String titulo);
-
-    public List<Livro> buscarISBN(Integer isbn);
-
-    public List<Livro> buscarAutor(String autor);
-
-    public List<Livro> buscarPreco(Double preco);
+    public List<Livro> busca(String filtro, String valor);
 
     public Livro altTitulo(Long id, String novoTitulo);
 

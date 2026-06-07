@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Deque;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +27,7 @@ public class LivroService implements LivroServiceInterface {
 
     @Override
     public Livro criarLivro(Livro livro) {
-        Optional.ofNullable(this.repository.buscarExataISBN(livro.getIsbn())).ifPresent(l -> {
+        Optional.ofNullable(this.repository.buscarExataIsbn(livro.getIsbn())).ifPresent(l -> {
             throw new LivroExcecao("Essa ISBN já está cadastrada", HttpStatus.CONFLICT);
         });
 
@@ -54,7 +57,7 @@ public class LivroService implements LivroServiceInterface {
     }
 
     @Override
-    public Deque<Livro> historico() {
+    public List<Livro> historico() {
         this.verificar();
 
         return this.repository.historicoLivro();
@@ -66,31 +69,25 @@ public class LivroService implements LivroServiceInterface {
     }
 
     @Override
-    public List<Livro> buscarTitulo(String titulo) {
-        this.verificar();
-
-        return Optional.ofNullable(this.repository.buscarTitulo(titulo)).filter(l -> !l.isEmpty()).orElseThrow(BuscaVazia::new);
-    }
-
-    @Override
-    public List<Livro> buscarISBN(Integer isbn) {
-        this.verificar();
-
-        return Optional.ofNullable(this.repository.buscarISBN(isbn)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro com a ISBN: " + isbn + ", encontrado"));
-    }
-
-    @Override
-    public List<Livro> buscarAutor(String autor) {
-        this.verificar();
-
-        return Optional.ofNullable(this.repository.buscarAutor(autor)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum autor com esse nome encontrado: " + autor));
-    }
-
-    @Override
-    public List<Livro> buscarPreco(Double preco) {
-        this.verificar();
-
-        return Optional.ofNullable(this.repository.buscarPreco(preco)).filter(l -> !l.isEmpty()).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com esse preço: " + preco));
+    public List<Livro> busca(String filtro, String valor) {
+        return switch (filtro) {
+            case "titulo" -> Optional.ofNullable(this.repository.buscarTitulo(valor))
+                    .filter(l -> !l.isEmpty())
+                    .orElseThrow(BuscaVazia::new);
+            case "autor" -> Optional.ofNullable(this.repository.buscarAutor(valor))
+                    .filter(l -> !l.isEmpty())
+                    .orElseThrow(BuscaVazia::new);
+            case "isbn" -> Optional.ofNullable(this.repository.buscarIsbn(Integer.parseInt(valor)))
+                    .filter(l -> !l.isEmpty())
+                    .orElseThrow(BuscaVazia::new);
+            case "preco" -> Optional.ofNullable(this.repository.buscarPreco(Double.parseDouble(valor)))
+                    .filter(l -> !l.isEmpty())
+                    .orElseThrow(BuscaVazia::new);
+            case "lancamento" -> Optional.ofNullable(this.repository.buscarLancamento(converter(valor)))
+                    .filter(l -> !l.isEmpty())
+                    .orElseThrow(BuscaVazia::new);
+            default -> throw new BuscaVazia("Opção de busca inválida ou não existe: " + filtro);
+        };
     }
 
     @Override
@@ -153,9 +150,23 @@ public class LivroService implements LivroServiceInterface {
         return this.repository.updateLivro(livro);
     }
 
-    public void verificar() {
+    private void verificar() {
         if (this.repository.isTabelaVazia()) {
             throw new BuscaVazia("Nenhum livro cadastrado");
         }
+    }
+
+    private List<LocalDate> converter(String valor) {
+        DateTimeFormatter formatar = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy")
+                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+                .toFormatter();
+
+        List<LocalDate> datas = new ArrayList<>(2);
+        datas.add(LocalDate.parse(valor, formatar));
+        datas.add(datas.get(0).withMonth(12).withDayOfMonth(31));
+
+        return datas;
     }
 }
