@@ -83,13 +83,13 @@ public class LivroRepository {
     }
 
     public List<Livro> buscarTitulo(String titulo) {
-        String sql = "SELECT * FROM livro WHERE titulo LIKE CONCAT('%', :titulo, '%')";
+        String sql = "SELECT * FROM livro WHERE LOWER(titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))";
 
         return this.conn.query(sql, params("titulo", titulo), mapear());
     }
 
     public List<Livro> buscarAutor(String autor) {
-        String sql = "SELECT * FROM livro WHERE autor LIKE CONCAT('%', :autor, '%')";
+        String sql = "SELECT * FROM livro WHERE LOWER(autor) LIKE LOWER(CONCAT('%', :autor, '%'))";
 
         return this.conn.query(sql, params("autor", autor), mapear());
     }
