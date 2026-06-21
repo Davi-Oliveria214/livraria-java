@@ -1,6 +1,7 @@
 package com.livrariaJava.services;
 
 import com.livrariaJava.entity.Livro;
+import com.livrariaJava.entity.enums.Generos;
 import com.livrariaJava.exception.BuscaVazia;
 import com.livrariaJava.exception.LivroExcecao;
 import com.livrariaJava.interfaces.LivroServiceInterface;
@@ -86,6 +87,9 @@ public class LivroService implements LivroServiceInterface {
             case "lancamento" -> Optional.ofNullable(this.repository.buscarLancamento(converter(valor)))
                     .filter(l -> !l.isEmpty())
                     .orElseThrow(BuscaVazia::new);
+            case "genero" -> Optional.ofNullable(this.repository.porGeneros(validarGenero(valor)))
+                    .filter(l -> !l.isEmpty())
+                    .orElseThrow(() -> new BuscaVazia("Nenhum livro do gênero " + valor + " encontrado"));
             default -> throw new BuscaVazia("Opção de busca inválida ou não existe: " + filtro);
         };
     }
@@ -148,6 +152,16 @@ public class LivroService implements LivroServiceInterface {
         livro.setLancamento(novaData);
 
         return this.repository.updateLivro(livro);
+    }
+
+    private String validarGenero(String genero) {
+        Generos g = Generos.paraString(genero);
+
+        if (g == null) {
+            throw new BuscaVazia("Gênero de livro não disponível", HttpStatus.BAD_REQUEST);
+        }
+
+        return g.getValorBanco();
     }
 
     private void verificar() {

@@ -1,6 +1,7 @@
 package com.livrariaJava.controller;
 
 import com.livrariaJava.entity.Livro;
+import com.livrariaJava.entity.enums.Generos;
 import com.livrariaJava.services.LivroService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class LivroController {
     }
 
     @GetMapping("/filtro/{filtro}")
-    public ResponseEntity<?> busca(@PathVariable("filtro") String filtro, @RequestParam("valor") String valor){
+    public ResponseEntity<?> busca(@PathVariable("filtro") String filtro, @RequestParam("valor") String valor) {
         return ResponseEntity.status(200).body(this.service.busca(filtro, valor));
     }
 

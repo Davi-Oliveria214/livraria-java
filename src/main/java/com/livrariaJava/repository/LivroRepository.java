@@ -1,6 +1,7 @@
 package com.livrariaJava.repository;
 
 import com.livrariaJava.entity.Livro;
+import com.livrariaJava.entity.enums.Generos;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -10,7 +11,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -23,7 +23,7 @@ public class LivroRepository {
     }
 
     public Livro newLivro(Livro livro) {
-        String sql = "INSERT INTO livro(titulo, autor, isbn, preco, estoque, lancamento) VALUES (:titulo, :autor, :isbn, :preco, :estoque, :lancamento)";
+        String sql = "INSERT INTO livro(titulo, autor, isbn, preco, genero, estoque, lancamento) VALUES (:titulo, :autor, :isbn, :preco, :genero, :estoque, :lancamento)";
 
         KeyHolder key = new GeneratedKeyHolder();
         SqlParameterSource params = new BeanPropertySqlParameterSource(livro);
@@ -42,7 +42,7 @@ public class LivroRepository {
     }
 
     public Livro updateLivro(Livro livro) {
-        String sql = "UPDATE livro SET titulo = :titulo, autor = :autor, isbn = :isbn, preco = :preco, estoque = :estoque, lancamento = :lancamento WHERE id = :id";
+        String sql = "UPDATE livro SET titulo = :titulo, autor = :autor, isbn = :isbn, preco = :preco, genero = :genero, estoque = :estoque, lancamento = :lancamento WHERE id = :id";
 
         this.conn.update(sql, new BeanPropertySqlParameterSource(livro));
 
@@ -113,6 +113,12 @@ public class LivroRepository {
         map.put("min", minPreco);
         map.put("max", maxPreco);
         return this.conn.query(sql, map, mapear());
+    }
+
+    public List<Livro> porGeneros(String valor) {
+        String sql = "SELECT * FROM livro WHERE genero = CAST(:g AS generos)";
+
+        return this.conn.query(sql, params("g", valor), mapear());
     }
 
     public boolean isTabelaVazia() {

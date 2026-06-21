@@ -10,4 +10,8 @@ public class BuscaVazia extends LivroExcecao {
     public BuscaVazia(String mensagem) {
         super(mensagem, HttpStatus.NOT_FOUND);
     }
+
+    public BuscaVazia(String mensagem, HttpStatus status) {
+        super(mensagem, status);
+    }
 }

@@ -1,5 +1,9 @@
 package com.livrariaJava.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.livrariaJava.entity.enums.Generos;
+
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
@@ -10,6 +14,7 @@ public class Livro {
     private Double preco;
     private Integer isbn;
     private Integer estoque;
+    private String genero;
     private LocalDate lancamento;
     private Timestamp criado_em;
 
@@ -17,13 +22,14 @@ public class Livro {
 
     }
 
-    public Livro(Long id, String titulo, String autor, Double preco, Integer isbn, Integer estoque, LocalDate lancamento, Timestamp criado_em) {
+    public Livro(Long id, String titulo, String autor, Double preco, Integer isbn, Integer estoque, String genero, LocalDate lancamento, Timestamp criado_em) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
         this.preco = preco;
         this.isbn = isbn;
         this.estoque = estoque;
+        this.genero = genero;
         this.lancamento = lancamento;
         this.criado_em = criado_em;
     }
@@ -90,6 +96,21 @@ public class Livro {
 
     public void setCriado_em(Timestamp criado_em) {
         this.criado_em = criado_em;
+    }
+
+    @JsonIgnore
+    public String getGenero() {
+        return genero;
+    }
+
+    @JsonProperty("genero")
+    public String getGeneroExibir() {
+        Generos g = Generos.paraString(this.genero);
+        return g != null ? g.getGenero() : null;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
     }
 
     @Override
