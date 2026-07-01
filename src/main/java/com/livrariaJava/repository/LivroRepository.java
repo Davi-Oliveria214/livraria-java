@@ -1,7 +1,6 @@
 package com.livrariaJava.repository;
 
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.entity.enums.Generos;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

@@ -8,9 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -34,8 +32,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     private ResponseEntity<Object> erroGenerico(Exception exception) {
         BodyGlobalError global = new BodyGlobalError();
-        global.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        global.setError(global.getStatus().name());
+        global.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+        global.setError(global.getStatus());
         global.setMessage(exception.getMessage());
 
         return ResponseEntity.status(global.getStatus()).body(global);
@@ -44,8 +42,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     private ResponseEntity<Object> createBodyHandler(EmptyResultDataAccessException e) {
         BodyGlobalError global = new BodyGlobalError();
-        global.setStatus(HttpStatus.NOT_FOUND);
-        global.setError(global.getStatus().name());
+        global.setStatusCode(HttpStatus.NOT_FOUND);
+        global.setError(global.getStatus());
         global.setMessage(new BuscaVazia().getMessage());
 
         return ResponseEntity.status(global.getStatus()).body(global);
@@ -54,8 +52,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected @Nullable ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         BodyGlobalError global = new BodyGlobalError();
-        global.setStatus((HttpStatus) status);
-        global.setError(global.getStatus().name());
+        global.setStatusCode(status);
+        global.setError(global.getStatus());
         global.setMessage(ex.getMessage());
 
         return ResponseEntity.status(global.getStatus()).body(global);
@@ -63,8 +61,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private BodyGlobalError createBodyHandler(LivroExcecao e) {
         BodyGlobalError global = new BodyGlobalError();
-        global.setStatus(e.getStatus());
-        global.setError(global.statusName());
+        global.setStatusCode(e.getStatus());
+        global.setError(global.getStatus());
         global.setMessage(e.getMessage());
 
         return global;
