@@ -2,35 +2,31 @@ package com.livrariaJava.entity.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.livrariaJava.entity.Generos;
 
-public enum Generos {
-    INDEFINIDO("indefinido"),
-    ACAO("acao", "ação"),
-    ROMANCE("romance"),
-    DRAMA("drama"),
-    SUSPENSE("suspense"),
-    TERROR("terror"),
-    AVENTURA("aventura"),
-    COMEDIA("comedia", "comédia"),
-    MISTERIO("misterio", "mistério");
+public enum GenerosEnum {
+    INDEFINIDO("ptI10", "indefinido"),
+    ACAO("ptA04", "ação"),
+    ROMANCE("ptR07", "romance"),
+    DRAMA("ptD05", "drama"),
+    SUSPENSE("ptS08", "suspense"),
+    TERROR("ptT06", "terror"),
+    AVENTURA("ptA08", "aventura"),
+    COMEDIA("ptC07", "comédia"),
+    MISTERIO("ptM08", "mistério");
 
-    private final String valorBanco;
+    private final String codigo;
     private final String genero;
 
-    Generos(String genero) {
-        this.valorBanco = genero;
-        this.genero = genero;
-    }
-
-    Generos(String valorBanco, String genero) {
-        this.valorBanco = valorBanco;
+    GenerosEnum(String codigo, String genero) {
+        this.codigo = codigo;
         this.genero = genero;
     }
 
     @JsonCreator
-    public static Generos paraString(String valor) {
-        for (Generos g : Generos.values()) {
-            if (g.valorBanco.equalsIgnoreCase(valor) || g.name().equalsIgnoreCase(valor)) {
+    public static GenerosEnum paraString(String codigo) {
+        for (GenerosEnum g : GenerosEnum.values()) {
+            if (g.codigo.equalsIgnoreCase(codigo) || g.name().equalsIgnoreCase(codigo)) {
                 return g;
             }
         }
@@ -44,6 +40,6 @@ public enum Generos {
     }
 
     public String getValorBanco() {
-        return valorBanco;
+        return codigo;
     }
 }
