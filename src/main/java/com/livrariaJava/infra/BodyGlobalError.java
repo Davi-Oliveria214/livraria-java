@@ -1,12 +1,13 @@
 package com.livrariaJava.infra;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 import java.time.LocalDateTime;
 
 public class BodyGlobalError {
     private final LocalDateTime timestamp;
-    private HttpStatusCode status;
+    private int status;
     private String error;
     private String message;
 
@@ -15,11 +16,11 @@ public class BodyGlobalError {
     }
 
     public void setStatusCode(HttpStatusCode status) {
-        this.status = status;
+        this.status = status.value();
     }
 
-    public void setError(HttpStatusCode error) {
-        this.error = error.getClass().getName();
+    public void setError(int error) {
+        this.error = HttpStatus.valueOf(error).name();
     }
 
     public void setMessage(String message) {
@@ -30,7 +31,7 @@ public class BodyGlobalError {
         return timestamp;
     }
 
-    public HttpStatusCode getStatus() {
+    public int getStatus() {
         return status;
     }
 
