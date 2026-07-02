@@ -4,14 +4,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Generos {
+    INDEFINIDO("indefinido"),
     ACAO("acao", "ação"),
-    ROMANCE("romance", "romance"),
-    DRAMA("drama", "drama"),
-    SUSPENSE("suspense", "suspense"),
-    TERROR("terror", "terror");
+    ROMANCE("romance"),
+    DRAMA("drama"),
+    SUSPENSE("suspense"),
+    TERROR("terror"),
+    AVENTURA("aventura"),
+    COMEDIA("comedia", "comédia"),
+    MISTERIO("misterio", "mistério");
 
     private final String valorBanco;
     private final String genero;
+
+    Generos(String genero) {
+        this.valorBanco = genero;
+        this.genero = genero;
+    }
 
     Generos(String valorBanco, String genero) {
         this.valorBanco = valorBanco;
