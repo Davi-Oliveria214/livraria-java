@@ -1,7 +1,7 @@
 package com.livrariaJava.services;
 
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.entity.enums.Generos;
+import com.livrariaJava.entity.enums.GenerosEnum;
 import com.livrariaJava.exception.BuscaVazia;
 import com.livrariaJava.exception.LivroExcecao;
 import com.livrariaJava.interfaces.LivroServiceInterface;
@@ -28,9 +28,8 @@ public class LivroService implements LivroServiceInterface {
 
     @Override
     public Livro criarLivro(Livro livro) {
-        Optional.ofNullable(this.repository.buscarExataIsbn(livro.getIsbn())).ifPresent(l -> {
+        if (this.repository.isIsbn(livro.getIsbn()) != null)
             throw new LivroExcecao("Essa ISBN já está cadastrada", HttpStatus.CONFLICT);
-        });
 
         for (Livro l : this.repository.buscarTitulo(livro.getTitulo())) {
             if (Objects.equals(l.getTitulo(), livro.getTitulo()) && Objects.equals(l.getAutor(), livro.getAutor())) {
@@ -78,7 +77,7 @@ public class LivroService implements LivroServiceInterface {
             case "autor" -> Optional.ofNullable(this.repository.buscarAutor(valor))
                     .filter(l -> !l.isEmpty())
                     .orElseThrow(BuscaVazia::new);
-            case "isbn" -> Optional.ofNullable(this.repository.buscarIsbn(Integer.parseInt(valor)))
+            case "isbn" -> Optional.ofNullable(this.repository.buscarIsbn(valor))
                     .filter(l -> !l.isEmpty())
                     .orElseThrow(BuscaVazia::new);
             case "preco" -> Optional.ofNullable(this.repository.buscarPreco(Double.parseDouble(valor)))
@@ -135,7 +134,7 @@ public class LivroService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro altISBN(Long id, Integer novaISBN) {
+    public Livro altISBN(Long id, String novaISBN) {
         this.verificar();
 
         Livro livro = this.buscarId(id);
@@ -155,7 +154,7 @@ public class LivroService implements LivroServiceInterface {
     }
 
     private String validarGenero(String genero) {
-        Generos g = Generos.paraString(genero);
+        GenerosEnum g = GenerosEnum.paraString(genero);
 
         if (g == null) {
             throw new BuscaVazia("Gênero de livro não disponível", HttpStatus.BAD_REQUEST);

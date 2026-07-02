@@ -26,7 +26,7 @@ public interface LivroServiceInterface {
 
     public Livro altEstoque(Long id, Integer novoEstoque);
 
-    public Livro altISBN(Long id, Integer novaISBN);
+    public Livro altISBN(Long id, String novaISBN);
 
     public Livro altData(Long id, LocalDate novaData);
 }

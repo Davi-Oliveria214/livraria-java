@@ -1,6 +1,8 @@
 package com.livrariaJava.repository;
 
+import com.livrariaJava.entity.Generos;
 import com.livrariaJava.entity.Livro;
+import com.livrariaJava.entity.enums.GenerosEnum;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -22,7 +24,7 @@ public class LivroRepository {
     }
 
     public Livro newLivro(Livro livro) {
-        String sql = "INSERT INTO livro(titulo, autor, isbn, preco, genero, estoque, lancamento) VALUES (:titulo, :autor, :isbn, :preco, :genero, :estoque, :lancamento)";
+        String sql = "INSERT INTO tb_livros(titulo, autor, isbn, preco, genero, estoque, lancamento) VALUES (:titulo, :autor, :isbn, :preco, :genero, :estoque, :lancamento)";
 
         KeyHolder key = new GeneratedKeyHolder();
         SqlParameterSource params = new BeanPropertySqlParameterSource(livro);
@@ -32,7 +34,7 @@ public class LivroRepository {
     }
 
     public void delLivro(Long id) {
-        String sql = "DELETE FROM livro WHERE id = :id";
+        String sql = "DELETE FROM tb_livros WHERE id = :id";
 
         Map<String, Object> map = new HashMap<>();
         map.put("id", id);
@@ -41,7 +43,7 @@ public class LivroRepository {
     }
 
     public Livro updateLivro(Livro livro) {
-        String sql = "UPDATE livro SET titulo = :titulo, autor = :autor, isbn = :isbn, preco = :preco, genero = :genero, estoque = :estoque, lancamento = :lancamento WHERE id = :id";
+        String sql = "UPDATE tb_livros SET titulo = :titulo, autor = :autor, isbn = :isbn, preco = :preco, genero = :genero, estoque = :estoque, lancamento = :lancamento WHERE id = :id";
 
         this.conn.update(sql, new BeanPropertySqlParameterSource(livro));
 
@@ -49,52 +51,45 @@ public class LivroRepository {
     }
 
     public List<Livro> historicoLivro() {
-        String sql = "SELECT * FROM livro ORDER BY criado_em DESC";
+        String sql = "SELECT * FROM tb_livros ORDER BY criado_em DESC";
 
         return this.conn.query(sql, mapear());
     }
 
     public List<Livro> todosLivros() {
-        String sql = "SELECT * FROM livro";
+        String sql = "SELECT * FROM tb_livros";
 
         return this.conn.query(sql, mapear());
     }
 
     public Livro buscarId(Number id) {
-        String sql = "SELECT * FROM livro WHERE id = :id";
+        String sql = "SELECT * FROM tb_livros WHERE id = :id";
 
         List<Livro> l = this.conn.query(sql, params("id", id), mapear());
 
         return (!l.isEmpty()) ? l.get(0) : null;
     }
 
-    public Livro buscarExataIsbn(Integer isbn) {
-        String sql = "SELECT * FROM livro WHERE isbn = :isbn";
-
-        List<Livro> l = this.conn.query(sql, params("isbn", isbn), mapear());
-        return (!l.isEmpty()) ? l.get(0) : null;
-    }
-
-    public List<Livro> buscarIsbn(Integer isbn) {
-        String sql = "SELECT * FROM livro WHERE isbn::text LIKE CONCAT('%', :isbn, '%')";
+    public List<Livro> buscarIsbn(String isbn) {
+        String sql = "SELECT * FROM tb_livros WHERE isbn::text LIKE CONCAT('%', :isbn, '%')";
 
         return this.conn.query(sql, params("isbn", isbn), mapear());
     }
 
     public List<Livro> buscarTitulo(String titulo) {
-        String sql = "SELECT * FROM livro WHERE LOWER(titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))";
+        String sql = "SELECT * FROM tb_livros WHERE LOWER(titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))";
 
         return this.conn.query(sql, params("titulo", titulo), mapear());
     }
 
     public List<Livro> buscarAutor(String autor) {
-        String sql = "SELECT * FROM livro WHERE LOWER(autor) LIKE LOWER(CONCAT('%', :autor, '%'))";
+        String sql = "SELECT * FROM tb_livros WHERE LOWER(autor) LIKE LOWER(CONCAT('%', :autor, '%'))";
 
         return this.conn.query(sql, params("autor", autor), mapear());
     }
 
     public List<Livro> buscarLancamento(List<LocalDate> datas) {
-        String sql = "SELECT * FROM livro WHERE lancamento BETWEEN :inicio AND :fim";
+        String sql = "SELECT * FROM tb_livros WHERE lancamento BETWEEN :inicio AND :fim";
 
         Map<String, Object> map = new HashMap<>();
         map.put("inicio", datas.get(0));
@@ -106,7 +101,7 @@ public class LivroRepository {
         double margem = preco * 0.15;
         double minPreco = preco - margem;
         double maxPreco = preco + margem;
-        String sql = "SELECT * FROM livro WHERE preco BETWEEN :min AND :max";
+        String sql = "SELECT * FROM tb_livros WHERE preco BETWEEN :min AND :max";
 
         Map<String, Object> map = new HashMap<>();
         map.put("min", minPreco);
@@ -115,13 +110,18 @@ public class LivroRepository {
     }
 
     public List<Livro> porGeneros(String valor) {
-        String sql = "SELECT * FROM livro WHERE genero = CAST(:g AS generos)";
+        String sql = "SELECT * FROM tb_livros WHERE genero = :g";
 
         return this.conn.query(sql, params("g", valor), mapear());
     }
 
+    public Livro isIsbn(String isbn){
+        String sql = "SELECT * FROM tb_livros WHERE isbn = :isbn";
+        return this.conn.queryForObject(sql, params("isbn", isbn), mapear());
+    }
+
     public boolean isTabelaVazia() {
-        String sql = "SELECT EXISTS (SELECT 1 FROM livro)";
+        String sql = "SELECT EXISTS (SELECT 1 FROM tb_livros)";
 
         return this.conn.query(sql, mapear()).isEmpty();
     }

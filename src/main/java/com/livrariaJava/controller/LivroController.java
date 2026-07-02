@@ -1,7 +1,6 @@
 package com.livrariaJava.controller;
 
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.entity.enums.Generos;
 import com.livrariaJava.services.LivroService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +57,7 @@ public class LivroController {
     }
 
     @PatchMapping("/{id}/isbn")
-    public ResponseEntity<?> altISBN(@PathVariable("id") Long id, @RequestParam("novaIsbn") Integer novaISBN) {
+    public ResponseEntity<?> altISBN(@PathVariable("id") Long id, @RequestParam("novaIsbn") String novaISBN) {
         return ResponseEntity.status(200).body(this.service.altISBN(id, novaISBN));
     }
 
