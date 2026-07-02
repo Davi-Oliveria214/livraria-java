@@ -2,7 +2,7 @@ package com.livrariaJava.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.livrariaJava.entity.enums.Generos;
+import com.livrariaJava.entity.enums.GenerosEnum;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -12,8 +12,9 @@ public class Livro {
     private String titulo;
     private String autor;
     private Double preco;
-    private Integer isbn;
+    private String isbn;
     private Integer estoque;
+    private String sinopse;
     private String genero;
     private LocalDate lancamento;
     private Timestamp criado_em;
@@ -22,16 +23,17 @@ public class Livro {
 
     }
 
-    public Livro(Long id, String titulo, String autor, Double preco, Integer isbn, Integer estoque, String genero, LocalDate lancamento, Timestamp criado_em) {
-        this.id = id;
-        this.titulo = titulo;
-        this.autor = autor;
-        this.preco = preco;
-        this.isbn = isbn;
-        this.estoque = estoque;
-        this.genero = genero;
-        this.lancamento = lancamento;
+    public Livro(Timestamp criado_em, LocalDate lancamento, String genero, String sinopse, Integer estoque, String isbn, Double preco, String autor, String titulo, Long id) {
         this.criado_em = criado_em;
+        this.lancamento = lancamento;
+        this.genero = genero;
+        this.sinopse = sinopse;
+        this.estoque = estoque;
+        this.isbn = isbn;
+        this.preco = preco;
+        this.autor = autor;
+        this.titulo = titulo;
+        this.id = id;
     }
 
     public Long getId() {
@@ -66,11 +68,11 @@ public class Livro {
         this.preco = preco;
     }
 
-    public Integer getIsbn() {
+    public String getIsbn() {
         return isbn;
     }
 
-    public void setIsbn(Integer isbn) {
+    public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
 
@@ -98,6 +100,14 @@ public class Livro {
         this.criado_em = criado_em;
     }
 
+    public String getSinopse() {
+        return sinopse;
+    }
+
+    public void setSinopse(String sinopse) {
+        this.sinopse = sinopse;
+    }
+
     @JsonIgnore
     public String getGenero() {
         return genero;
@@ -105,7 +115,7 @@ public class Livro {
 
     @JsonProperty("genero")
     public String getGeneroExibir() {
-        Generos g = Generos.paraString(this.genero);
+        GenerosEnum g = GenerosEnum.paraString(this.genero);
         return g != null ? g.getGenero() : null;
     }
 
