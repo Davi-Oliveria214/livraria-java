@@ -1,6 +1,5 @@
 package com.livrariaJava.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.livrariaJava.entity.enums.GenerosEnum;
 
@@ -16,6 +15,7 @@ public class Livro {
     private Integer estoque;
     private String sinopse;
     private String genero;
+    private String codigoGenero;
     private LocalDate lancamento;
     private Timestamp criado_em;
 
@@ -23,17 +23,17 @@ public class Livro {
 
     }
 
-    public Livro(Timestamp criado_em, LocalDate lancamento, String genero, String sinopse, Integer estoque, String isbn, Double preco, String autor, String titulo, Long id) {
-        this.criado_em = criado_em;
-        this.lancamento = lancamento;
-        this.genero = genero;
-        this.sinopse = sinopse;
-        this.estoque = estoque;
-        this.isbn = isbn;
-        this.preco = preco;
-        this.autor = autor;
-        this.titulo = titulo;
+    public Livro(Long id, String titulo, String autor, Double preco, String isbn, Integer estoque, String sinopse, String genero, LocalDate lancamento, Timestamp criado_em) {
         this.id = id;
+        this.titulo = titulo;
+        this.autor = autor;
+        this.preco = preco;
+        this.isbn = isbn;
+        this.estoque = estoque;
+        this.sinopse = sinopse;
+        this.genero = genero;
+        this.lancamento = lancamento;
+        this.criado_em = criado_em;
     }
 
     public Long getId() {
@@ -108,19 +108,21 @@ public class Livro {
         this.sinopse = sinopse;
     }
 
-    @JsonIgnore
+    @JsonProperty(value = "genero", access = JsonProperty.Access.WRITE_ONLY)
     public String getGenero() {
+        return codigoGenero;
+    }
+
+    @JsonProperty(value = "genero", access = JsonProperty.Access.READ_ONLY)
+    public String getGeneroExibir() {
         return genero;
     }
 
-    @JsonProperty("genero")
-    public String getGeneroExibir() {
-        GenerosEnum g = GenerosEnum.paraString(this.genero);
-        return g != null ? g.getGenero() : null;
-    }
-
     public void setGenero(String genero) {
-        this.genero = genero;
+        GenerosEnum g = GenerosEnum.paraString(genero);
+
+        this.genero = g != null ? g.getGenero() : null;
+        this.codigoGenero = g != null ? g.getValorBanco() : null;
     }
 
     @Override
