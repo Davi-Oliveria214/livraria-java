@@ -1,8 +1,6 @@
 package com.livrariaJava.repository;
 
-import com.livrariaJava.entity.Generos;
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.entity.enums.GenerosEnum;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,13 +22,15 @@ public class LivroRepository {
     }
 
     public Livro newLivro(Livro livro) {
-        String sql = "INSERT INTO tb_livros(titulo, autor, isbn, preco, genero, estoque, lancamento) VALUES (:titulo, :autor, :isbn, :preco, :genero, :estoque, :lancamento)";
+        String sql = "INSERT INTO tb_livros(titulo, autor, isbn, preco, genero, estoque, sinopse, lancamento) " +
+                "VALUES (:titulo, :autor, :isbn, :preco, :genero, :estoque, :sinopse, :lancamento)";
 
         KeyHolder key = new GeneratedKeyHolder();
         SqlParameterSource params = new BeanPropertySqlParameterSource(livro);
 
-        this.conn.update(sql, params, key);
-        return livro;
+        this.conn.update(sql, params, key, new String[]{"id"});
+
+        return key.getKey() != null ? buscarId(key.getKey()) : livro;
     }
 
     public void delLivro(Long id) {
@@ -115,9 +115,19 @@ public class LivroRepository {
         return this.conn.query(sql, params("g", valor), mapear());
     }
 
-    public Livro isIsbn(String isbn){
+    public boolean isIsbn(String isbn) {
         String sql = "SELECT * FROM tb_livros WHERE isbn = :isbn";
-        return this.conn.queryForObject(sql, params("isbn", isbn), mapear());
+        return this.conn.query(sql, params("isbn", isbn), mapear()).isEmpty();
+    }
+
+    public boolean isAutorTitulo(String autor, String titulo) {
+        String sql = "SELECT * FROM tb_livros WHERE autor = :autor AND titulo = :titulo";
+
+        Map<String, String> map = new HashMap<>();
+        map.put("autor", autor);
+        map.put("titulo", titulo);
+
+        return this.conn.query(sql, map, mapear()).isEmpty();
     }
 
     public boolean isTabelaVazia() {
