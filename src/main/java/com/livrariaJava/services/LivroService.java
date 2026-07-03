@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
 import java.util.Optional;
 
 @Service
@@ -28,15 +28,12 @@ public class LivroService implements LivroServiceInterface {
 
     @Override
     public Livro criarLivro(Livro livro) {
-        if (this.repository.isIsbn(livro.getIsbn()) != null)
+        if (!this.repository.isIsbn(livro.getIsbn()))
             throw new LivroExcecao("Essa ISBN já está cadastrada", HttpStatus.CONFLICT);
 
-        for (Livro l : this.repository.buscarTitulo(livro.getTitulo())) {
-            if (Objects.equals(l.getTitulo(), livro.getTitulo()) && Objects.equals(l.getAutor(), livro.getAutor())) {
-                throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
-                        HttpStatus.CONFLICT);
-            }
-        }
+        if (!this.repository.isAutorTitulo(livro.getAutor(), livro.getTitulo()))
+            throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
+                    HttpStatus.CONFLICT);
 
         return this.repository.newLivro(livro);
     }
@@ -65,30 +62,20 @@ public class LivroService implements LivroServiceInterface {
 
     @Override
     public Livro buscarId(Long id) {
+        this.verificar();
+
         return Optional.ofNullable(this.repository.buscarId(id)).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com o ID: " + id));
     }
 
     @Override
     public List<Livro> busca(String filtro, String valor) {
         return switch (filtro) {
-            case "titulo" -> Optional.ofNullable(this.repository.buscarTitulo(valor))
-                    .filter(l -> !l.isEmpty())
-                    .orElseThrow(BuscaVazia::new);
-            case "autor" -> Optional.ofNullable(this.repository.buscarAutor(valor))
-                    .filter(l -> !l.isEmpty())
-                    .orElseThrow(BuscaVazia::new);
-            case "isbn" -> Optional.ofNullable(this.repository.buscarIsbn(valor))
-                    .filter(l -> !l.isEmpty())
-                    .orElseThrow(BuscaVazia::new);
-            case "preco" -> Optional.ofNullable(this.repository.buscarPreco(Double.parseDouble(valor)))
-                    .filter(l -> !l.isEmpty())
-                    .orElseThrow(BuscaVazia::new);
-            case "lancamento" -> Optional.ofNullable(this.repository.buscarLancamento(converter(valor)))
-                    .filter(l -> !l.isEmpty())
-                    .orElseThrow(BuscaVazia::new);
-            case "genero" -> Optional.ofNullable(this.repository.porGeneros(validarGenero(valor)))
-                    .filter(l -> !l.isEmpty())
-                    .orElseThrow(() -> new BuscaVazia("Nenhum livro do gênero " + valor + " encontrado"));
+            case "titulo" -> validarRetorno(this.repository.buscarTitulo(valor));
+            case "autor" -> validarRetorno(this.repository.buscarAutor(valor));
+            case "isbn" -> validarRetorno(this.repository.buscarIsbn(valor));
+            case "preco" -> validarRetorno(this.repository.buscarPreco(Double.parseDouble(valor)));
+            case "lancamento" -> validarRetorno(this.repository.buscarLancamento(converter(valor)));
+            case "genero" -> validarRetorno(this.repository.porGeneros(validarGenero(valor)));
             default -> throw new BuscaVazia("Opção de busca inválida ou não existe: " + filtro);
         };
     }
@@ -151,6 +138,13 @@ public class LivroService implements LivroServiceInterface {
         livro.setLancamento(novaData);
 
         return this.repository.updateLivro(livro);
+    }
+
+    private List<Livro> validarRetorno(List<Livro> livros) {
+        if (livros.isEmpty())
+            throw new BuscaVazia("Nanhum livro encontrado com");
+
+        return livros;
     }
 
     private String validarGenero(String genero) {
