@@ -27,117 +27,73 @@ public class LivroService implements LivroServiceInterface {
     }
 
     @Override
-    public Livro criarLivro(Livro livro) {
+    public Livro cadastrarLivro(Livro livro) {
         if (!this.repository.isIsbn(livro.getIsbn()))
             throw new LivroExcecao("Essa ISBN já está cadastrada", HttpStatus.CONFLICT);
 
-        if (!this.repository.isAutorTitulo(livro.getAutor(), livro.getTitulo()))
+        if (!this.repository.autorAndTitulo(livro.getAutor(), livro.getTitulo()))
             throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
                     HttpStatus.CONFLICT);
 
-        return this.repository.newLivro(livro);
+        return this.repository.cadastrarLivro(livro);
     }
 
     @Override
-    public String delLivro(Long id) {
+    public String deletarLivro(Long id) {
         Livro livro = this.buscarId(id);
 
-        this.repository.delLivro(id);
+        this.repository.deletarLivro(id);
         return "Livro: " + livro.getTitulo() + " do autor " + livro.getAutor() + " deletado com sucesso";
     }
 
     @Override
-    public List<Livro> getLivros() {
-        this.verificar();
+    public List<Livro> todosLivros() {
+        this.isLivros();
 
         return this.repository.todosLivros();
     }
 
     @Override
-    public List<Livro> historico() {
-        this.verificar();
+    public List<Livro> historicoLivro() {
+        this.isLivros();
 
         return this.repository.historicoLivro();
     }
 
     @Override
     public Livro buscarId(Long id) {
-        this.verificar();
+        this.isLivros();
 
-        return Optional.ofNullable(this.repository.buscarId(id)).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com o ID: " + id));
+        return Optional.ofNullable(this.repository.porId(id)).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com o ID: " + id));
     }
 
     @Override
-    public List<Livro> busca(String filtro, String valor) {
+    public List<Livro> filtroLivro(String filtro, String valor) {
+        this.isLivros();
+
         return switch (filtro) {
-            case "titulo" -> validarRetorno(this.repository.buscarTitulo(valor));
-            case "autor" -> validarRetorno(this.repository.buscarAutor(valor));
-            case "isbn" -> validarRetorno(this.repository.buscarIsbn(valor));
-            case "preco" -> validarRetorno(this.repository.buscarPreco(Double.parseDouble(valor)));
-            case "lancamento" -> validarRetorno(this.repository.buscarLancamento(converter(valor)));
+            case "titulo" -> validarRetorno(this.repository.porTitulo(valor));
+            case "autor" -> validarRetorno(this.repository.porAutor(valor));
+            case "isbn" -> validarRetorno(this.repository.porIsbn(valor));
+            case "preco" -> validarRetorno(this.repository.porPreco(Double.parseDouble(valor)));
+            case "lancamento" -> validarRetorno(this.repository.porLancamento(anoInicioFim(valor)));
             case "genero" -> validarRetorno(this.repository.porGeneros(validarGenero(valor)));
             default -> throw new BuscaVazia("Opção de busca inválida ou não existe: " + filtro);
         };
     }
 
     @Override
-    public Livro altTitulo(Long id, String novoTitulo) {
-        this.verificar();
+    public Livro atualizarLivro(Long id, String tabela, String novoValor) {
+        this.isLivros();
+        this.buscarId(id);
 
-        Livro livro = this.buscarId(id);
-        livro.setTitulo(novoTitulo);
-
-        return this.repository.updateLivro(livro);
-    }
-
-    @Override
-    public Livro altAutor(Long id, String novoAutor) {
-        this.verificar();
-
-        Livro livro = this.buscarId(id);
-        livro.setAutor(novoAutor);
-
-        return this.repository.updateLivro(livro);
-    }
-
-    @Override
-    public Livro altPreco(Long id, Double novoPreco) {
-        this.verificar();
-
-        Livro livro = this.buscarId(id);
-        livro.setPreco(novoPreco);
-
-        return this.repository.updateLivro(livro);
-    }
-
-    @Override
-    public Livro altEstoque(Long id, Integer novoEstoque) {
-        this.verificar();
-
-        Livro livro = this.buscarId(id);
-        livro.setEstoque(novoEstoque);
-
-        return this.repository.updateLivro(livro);
-    }
-
-    @Override
-    public Livro altISBN(Long id, String novaISBN) {
-        this.verificar();
-
-        Livro livro = this.buscarId(id);
-        livro.setIsbn(novaISBN);
-
-        return this.repository.updateLivro(livro);
-    }
-
-    @Override
-    public Livro altData(Long id, LocalDate novaData) {
-        this.verificar();
-
-        Livro livro = this.buscarId(id);
-        livro.setLancamento(novaData);
-
-        return this.repository.updateLivro(livro);
+        return switch (tabela) {
+            case "lancamento" -> this.repository.atualizarLivro(id, tabela, LocalDate.parse(novoValor));
+            case "preco" -> this.repository.atualizarLivro(id, tabela, Double.parseDouble(novoValor));
+            case "estoque" -> this.repository.atualizarLivro(id, tabela, Integer.parseInt(novoValor));
+            case "genero" -> this.repository.atualizarLivro(id, tabela, validarGenero(novoValor));
+            default -> this.repository.atualizarLivro(id, tabela, novoValor);
+        };
     }
 
     private List<Livro> validarRetorno(List<Livro> livros) {
@@ -150,20 +106,18 @@ public class LivroService implements LivroServiceInterface {
     private String validarGenero(String genero) {
         GenerosEnum g = GenerosEnum.paraString(genero);
 
-        if (g == null) {
+        if (g == null)
             throw new BuscaVazia("Gênero de livro não disponível", HttpStatus.BAD_REQUEST);
-        }
 
         return g.getValorBanco();
     }
 
-    private void verificar() {
-        if (this.repository.isTabelaVazia()) {
+    private void isLivros() {
+        if (this.repository.isTabelaVazia())
             throw new BuscaVazia("Nenhum livro cadastrado");
-        }
     }
 
-    private List<LocalDate> converter(String valor) {
+    private List<LocalDate> anoInicioFim(String valor) {
         DateTimeFormatter formatar = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy")
                 .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)

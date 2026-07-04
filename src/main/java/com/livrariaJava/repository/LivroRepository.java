@@ -21,7 +21,7 @@ public class LivroRepository {
         this.conn = livroConnection;
     }
 
-    public Livro newLivro(Livro livro) {
+    public Livro cadastrarLivro(Livro livro) {
         String sql = "INSERT INTO tb_livros(titulo, autor, isbn, preco, genero, estoque, sinopse, lancamento) " +
                 "VALUES (:titulo, :autor, :isbn, :preco, :genero, :estoque, :sinopse, :lancamento)";
 
@@ -30,10 +30,10 @@ public class LivroRepository {
 
         this.conn.update(sql, params, key, new String[]{"id"});
 
-        return key.getKey() != null ? buscarId(key.getKey()) : livro;
+        return key.getKey() != null ? porId(key.getKey()) : livro;
     }
 
-    public void delLivro(Long id) {
+    public void deletarLivro(Long id) {
         String sql = "DELETE FROM tb_livros WHERE id = :id";
 
         Map<String, Object> map = new HashMap<>();
@@ -42,62 +42,78 @@ public class LivroRepository {
         this.conn.update(sql, map);
     }
 
-    public Livro updateLivro(Livro livro) {
-        String sql = "UPDATE tb_livros SET titulo = :titulo, autor = :autor, isbn = :isbn, preco = :preco, genero = :genero, estoque = :estoque, lancamento = :lancamento WHERE id = :id";
+    public Livro atualizarLivro(Long id, String tabela, String valor) {
+        String sql = "UPDATE tb_livros SET " + tabela + " = :valor WHERE id = :id";
 
-        this.conn.update(sql, new BeanPropertySqlParameterSource(livro));
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        map.put("valor", valor);
 
-        return livro;
+        this.conn.update(sql, map);
+
+        return porId(id);
+    }
+
+    public Livro atualizarLivro(Long id, String opcao, Object valor) {
+        String sql = "UPDATE tb_livros SET " + opcao + " = :valor WHERE id = :id";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        map.put("valor", valor);
+
+        this.conn.update(sql, map);
+
+        return porId(id);
     }
 
     public List<Livro> historicoLivro() {
         String sql = "SELECT * FROM tb_livros ORDER BY criado_em DESC";
 
-        return this.conn.query(sql, mapear());
+        return this.conn.query(sql, mapearLivro());
     }
 
     public List<Livro> todosLivros() {
         String sql = "SELECT * FROM tb_livros";
 
-        return this.conn.query(sql, mapear());
+        return this.conn.query(sql, mapearLivro());
     }
 
-    public Livro buscarId(Number id) {
+    public Livro porId(Number id) {
         String sql = "SELECT * FROM tb_livros WHERE id = :id";
 
-        List<Livro> l = this.conn.query(sql, params("id", id), mapear());
+        List<Livro> l = this.conn.query(sql, parametros("id", id), mapearLivro());
 
         return (!l.isEmpty()) ? l.get(0) : null;
     }
 
-    public List<Livro> buscarIsbn(String isbn) {
+    public List<Livro> porIsbn(String isbn) {
         String sql = "SELECT * FROM tb_livros WHERE isbn::text LIKE CONCAT('%', :isbn, '%')";
 
-        return this.conn.query(sql, params("isbn", isbn), mapear());
+        return this.conn.query(sql, parametros("isbn", isbn), mapearLivro());
     }
 
-    public List<Livro> buscarTitulo(String titulo) {
+    public List<Livro> porTitulo(String titulo) {
         String sql = "SELECT * FROM tb_livros WHERE LOWER(titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))";
 
-        return this.conn.query(sql, params("titulo", titulo), mapear());
+        return this.conn.query(sql, parametros("titulo", titulo), mapearLivro());
     }
 
-    public List<Livro> buscarAutor(String autor) {
+    public List<Livro> porAutor(String autor) {
         String sql = "SELECT * FROM tb_livros WHERE LOWER(autor) LIKE LOWER(CONCAT('%', :autor, '%'))";
 
-        return this.conn.query(sql, params("autor", autor), mapear());
+        return this.conn.query(sql, parametros("autor", autor), mapearLivro());
     }
 
-    public List<Livro> buscarLancamento(List<LocalDate> datas) {
+    public List<Livro> porLancamento(List<LocalDate> datas) {
         String sql = "SELECT * FROM tb_livros WHERE lancamento BETWEEN :inicio AND :fim";
 
         Map<String, Object> map = new HashMap<>();
         map.put("inicio", datas.get(0));
         map.put("fim", datas.get(1));
-        return this.conn.query(sql, map, mapear());
+        return this.conn.query(sql, map, mapearLivro());
     }
 
-    public List<Livro> buscarPreco(Double preco) {
+    public List<Livro> porPreco(Double preco) {
         double margem = preco * 0.15;
         double minPreco = preco - margem;
         double maxPreco = preco + margem;
@@ -106,41 +122,41 @@ public class LivroRepository {
         Map<String, Object> map = new HashMap<>();
         map.put("min", minPreco);
         map.put("max", maxPreco);
-        return this.conn.query(sql, map, mapear());
+        return this.conn.query(sql, map, mapearLivro());
     }
 
     public List<Livro> porGeneros(String valor) {
         String sql = "SELECT * FROM tb_livros WHERE genero = :g";
 
-        return this.conn.query(sql, params("g", valor), mapear());
+        return this.conn.query(sql, parametros("g", valor), mapearLivro());
     }
 
     public boolean isIsbn(String isbn) {
         String sql = "SELECT * FROM tb_livros WHERE isbn = :isbn";
-        return this.conn.query(sql, params("isbn", isbn), mapear()).isEmpty();
+        return this.conn.query(sql, parametros("isbn", isbn), mapearLivro()).isEmpty();
     }
 
-    public boolean isAutorTitulo(String autor, String titulo) {
+    public boolean autorAndTitulo(String autor, String titulo) {
         String sql = "SELECT * FROM tb_livros WHERE autor = :autor AND titulo = :titulo";
 
         Map<String, String> map = new HashMap<>();
         map.put("autor", autor);
         map.put("titulo", titulo);
 
-        return this.conn.query(sql, map, mapear()).isEmpty();
+        return this.conn.query(sql, map, mapearLivro()).isEmpty();
     }
 
     public boolean isTabelaVazia() {
         String sql = "SELECT EXISTS (SELECT 1 FROM tb_livros)";
 
-        return this.conn.query(sql, mapear()).isEmpty();
+        return this.conn.query(sql, mapearLivro()).isEmpty();
     }
 
-    private SqlParameterSource params(String tipo, Object valor) {
+    private SqlParameterSource parametros(String tipo, Object valor) {
         return new MapSqlParameterSource().addValue(tipo, valor);
     }
 
-    private BeanPropertyRowMapper<Livro> mapear() {
+    private BeanPropertyRowMapper<Livro> mapearLivro() {
         return new BeanPropertyRowMapper<>(Livro.class);
     }
 }
