@@ -9,9 +9,9 @@ public interface LivroServiceInterface {
 
     public String deletarLivro(Long id);
 
-    public List<Livro> todosLivros();
+    public List<Livro> todosLivros(int limit, int off);
 
-    public List<Livro> historicoLivro();
+    public List<Livro> historicoLivro(boolean ordem, int limit, int off);
 
     public Livro buscarId(Long id);
 

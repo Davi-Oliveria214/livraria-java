@@ -47,17 +47,17 @@ public class LivroService implements LivroServiceInterface {
     }
 
     @Override
-    public List<Livro> todosLivros() {
+    public List<Livro> todosLivros(int limit, int off) {
         this.isLivros();
 
-        return this.repository.todosLivros();
+        return this.repository.todosLivros(limit, off);
     }
 
     @Override
-    public List<Livro> historicoLivro() {
+    public List<Livro> historicoLivro(boolean ordem, int limit, int off) {
         this.isLivros();
 
-        return this.repository.historicoLivro();
+        return this.repository.historicoLivro(ordem, limit, off);
     }
 
     @Override

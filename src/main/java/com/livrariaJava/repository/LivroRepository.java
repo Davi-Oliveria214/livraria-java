@@ -66,16 +66,26 @@ public class LivroRepository {
         return porId(id);
     }
 
-    public List<Livro> historicoLivro() {
-        String sql = "SELECT * FROM tb_livros ORDER BY criado_em DESC";
+    public List<Livro> historicoLivro(Boolean ordem, Integer limit, Integer off) {
+        String sql = "SELECT * FROM tb_livros ORDER BY criado_em ";
+        sql += ordem ? "DESC" : "ASC";
+        sql += " LIMIT :limit OFFSET :off";
 
-        return this.conn.query(sql, mapearLivro());
+        Map<String, Object> map = new HashMap<>();
+        map.put("limit", limit);
+        map.put("off", off);
+
+        return this.conn.query(sql, map, mapearLivro());
     }
 
-    public List<Livro> todosLivros() {
-        String sql = "SELECT * FROM tb_livros";
+    public List<Livro> todosLivros(int limit, int off) {
+        String sql = "SELECT * FROM tb_livros ORDER BY id LIMIT :limit OFFSET :off";
 
-        return this.conn.query(sql, mapearLivro());
+        Map<String, Object> map = new HashMap<>();
+        map.put("limit", limit);
+        map.put("off", off);
+
+        return this.conn.query(sql, map, mapearLivro());
     }
 
     public Livro porId(Number id) {
