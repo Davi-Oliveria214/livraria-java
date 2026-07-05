@@ -2,7 +2,6 @@ package com.livrariaJava.entity.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.livrariaJava.entity.Generos;
 
 public enum GenerosEnum {
     INDEFINIDO("ptI10", "indefinido"),
@@ -24,9 +23,9 @@ public enum GenerosEnum {
     }
 
     @JsonCreator
-    public static GenerosEnum paraString(String codigo) {
+    public static GenerosEnum buscarGenero(String genero) {
         for (GenerosEnum g : GenerosEnum.values()) {
-            if (g.codigo.equalsIgnoreCase(codigo) || g.name().equalsIgnoreCase(codigo)) {
+            if (g.codigo.equalsIgnoreCase(genero) || g.name().equalsIgnoreCase(genero)) {
                 return g;
             }
         }
@@ -39,7 +38,7 @@ public enum GenerosEnum {
         return genero;
     }
 
-    public String getValorBanco() {
+    public String getCodigo() {
         return codigo;
     }
 }

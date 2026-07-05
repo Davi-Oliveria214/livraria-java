@@ -14,7 +14,7 @@ public class Generos {
     }
 
     public void setCodigo() {
-        this.codigo = genero.getValorBanco();
+        this.codigo = genero.getCodigo();
     }
 
     public String getGenero() {
@@ -22,6 +22,6 @@ public class Generos {
     }
 
     public void setGenero(String codigo) {
-        this.genero = GenerosEnum.paraString(codigo);
+        this.genero = GenerosEnum.buscarGenero(codigo);
     }
 }

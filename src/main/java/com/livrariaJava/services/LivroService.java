@@ -104,12 +104,12 @@ public class LivroService implements LivroServiceInterface {
     }
 
     private String validarGenero(String genero) {
-        GenerosEnum g = GenerosEnum.paraString(genero);
+        GenerosEnum g = GenerosEnum.buscarGenero(genero);
 
         if (g == null)
             throw new BuscaVazia("Gênero de livro não disponível", HttpStatus.BAD_REQUEST);
 
-        return g.getValorBanco();
+        return g.getCodigo();
     }
 
     private void isLivros() {

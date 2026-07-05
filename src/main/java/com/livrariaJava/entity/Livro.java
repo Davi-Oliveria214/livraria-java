@@ -15,7 +15,6 @@ public class Livro {
     private Integer estoque;
     private String sinopse;
     private String genero;
-    private String codigoGenero;
     private LocalDate lancamento;
     private Timestamp criado_em;
 
@@ -110,19 +109,18 @@ public class Livro {
 
     @JsonProperty(value = "genero", access = JsonProperty.Access.WRITE_ONLY)
     public String getGenero() {
-        return codigoGenero;
+        GenerosEnum g = GenerosEnum.buscarGenero(genero);
+        return g != null ? g.getCodigo() : GenerosEnum.INDEFINIDO.getCodigo();
     }
 
     @JsonProperty(value = "genero", access = JsonProperty.Access.READ_ONLY)
     public String getGeneroExibir() {
-        return genero;
+        GenerosEnum g = GenerosEnum.buscarGenero(genero);
+        return g != null ? g.getGenero() : GenerosEnum.INDEFINIDO.getGenero();
     }
 
     public void setGenero(String genero) {
-        GenerosEnum g = GenerosEnum.paraString(genero);
-
-        this.genero = g != null ? g.getGenero() : null;
-        this.codigoGenero = g != null ? g.getValorBanco() : null;
+        this.genero = genero;
     }
 
     @Override
