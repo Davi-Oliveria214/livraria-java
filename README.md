@@ -8,18 +8,18 @@ Originalmente uma aplicação Java simples, o sistema evoluiu para uma API robus
 
 ## 🚀 Funcionalidades
 
-A API disponibiliza diversos endpoints para o gerenciamento do acervo:
+A API disponibiliza diversos endpoints para o gerenciamento dos livros:
 
-- **Cadastro de Livros:** Adição de novos livros ao acervo com validação de unicidade (ISBN e combinação de Título + Autor).
+- **Cadastro de Livros:** Adição de novos livros com validação de unicidade (ISBN e combinação de Título + Autor).
 
 - **Listagem Completa:** Recuperação de todos os livros cadastrados.
 
 - **Buscas Específicas:**
     - Por ID.
-    - Por Filtro Genérico: busca por título, autor, ISBN, preço ou ano de lançamento.
-    - Histórico de livros (ordenado por data de criação).
+    - Por Filtro Genérico: busca por título, autor, ISBN, preço, ano de lançamento ou gênero.
+    - Histórico de livros (ordenado por data de criação, sendo possível alterar a ordem).
 
-- **Atualizações Parciais (PATCH):** Modificação individual de atributos do livro (Título, Autor, ISBN, Preço, Estoque e Data de Lançamento).
+- **Atualizações Parciais (PATCH):** Modificação individual de atributos do livro (Título, Autor, ISBN, Preço, Estoque, Data de Lançamento ou Gênero).
 
 - **Remoção:** Exclusão de livros do sistema pelo ID.
 
@@ -29,15 +29,17 @@ A API disponibiliza diversos endpoints para o gerenciamento do acervo:
 
 ## 🏗️ Arquitetura do Projeto
 
-O projeto foi refatorado para utilizar o framework **Spring Boot** e segue uma arquitetura em camadas bem definida, garantindo separação de responsabilidades e facilidade de manutenção:
+O projeto utiliza o framework **Spring Boot** e segue uma arquitetura em camadas bem definida, garantindo separação de responsabilidades e facilidade de manutenção:
 
-- **Controller (`com.livrariaJava.controller`):** Responsável por expor os endpoints REST, receber as requisições HTTP, delegar o processamento para a camada de serviço e retornar as respostas adequadas (ResponseEntity).
+- **Controller (`com.livrariaJava.controller`):** Camada responsável por definir os endpoints REST da API e receber as requisições HTTP, passando o processamento para a camada de serviço e retornando as respostas adequadas por meio do `ResponseEntity`.
 
 - **Service (`com.livrariaJava.services` e `com.livrariaJava.interfaces`):** Contém as regras de negócio da aplicação. Valida dados, verifica duplicidades e orquestra as chamadas ao repositório.
 
-- **Repository (`com.livrariaJava.repository`):** Camada de acesso a dados. Executa as operações de persistência diretamente no banco de dados utilizando `NamedParameterJdbcTemplate` do Spring, o que melhora a legibilidade e segurança na execução de queries SQL com parâmetros nomeados.
+- **Repository (`com.livrariaJava.repository`):** Responsável pelo acesso de dados. Executa as operações de persistência diretamente no banco de dados utilizando `NamedParameterJdbcTemplate` do Spring, garantindo legibilidade e segurança na execução de queries SQL com parâmetros nomeados.
 
-- **Entity (`com.livrariaJava.entity`):** Representa o modelo de domínio. A entidade `Livro` foi atualizada para utilizar classes wrapper (`Long`, `Integer`, `Double`) em vez de tipos primitivos, permitindo melhor tratamento de valores nulos e integração com APIs.
+- **Entity & Enums (`com.livrariaJava.entity` e `com.livrariaJava.entity.enums`):** Representam os modelos de domínio e as constantes do sistema.
+    - **Classe `Livro`:** Responsável por mapear os campos utilizando classes wrapper (`Long`, `Integer`, `Double`), permitindo melhor tratamento de valores nulos.
+    - **Classe `Genero` e `GenerosEnum`:** Estruturas criadas para padronizar, validar e categorizar os tipos de obras literárias aceitas pelo sistema de forma tipada.
 
 - **Exceptions (`com.livrariaJava.exception`):** Classes customizadas (`LivroExcecao`, `BuscaVazia`) que estendem `RuntimeException` e carregam o status HTTP correspondente ao erro.
 
@@ -62,16 +64,18 @@ O projeto foi refatorado para utilizar o framework **Spring Boot** e segue uma a
 
 A entidade principal do sistema possui os seguintes atributos:
 
-| Atributo | Tipo | Descrição |
-| --- | --- | --- |
-| `id` | `Long` | Identificador único do livro no banco de dados. |
-| `titulo` | `String` | Título da obra. |
-| `autor` | `String` | Nome do autor do livro. |
-| `preco` | `Double` | Valor de venda do livro. |
-| `isbn` | `Integer` | Código de identificação único do livro. |
-| `estoque` | `Integer` | Quantidade de exemplares disponíveis. |
-| `lancamento` | `LocalDate` | Data de lançamento da obra. |
-| `criado_em` | `Timestamp` | Data e hora de criação do registro do livro. |
+| Atributo       | Tipo        | Descrição                                       |
+|----------------|-------------|-------------------------------------------------|
+| `id`           | `Long`      | Identificador único do livro no banco de dados. |
+| `titulo`       | `String`    | Título da obra.                                 |
+| `autor`        | `String`    | Nome do autor do livro.                         |
+| `preco`        | `Double`    | Valor de venda do livro.                        |
+| `isbn`         | `String`    | Código de identificação único do livro.         |
+| `sinopse`      | `String`    | Sinopse do livro.                               |
+| `genero`       | `String`    | Gênero do livro                                 |
+| `estoque`      | `Integer`   | Quantidade de exemplares disponíveis.           |
+| `lancamento`   | `LocalDate` | Data de lançamento da obra.                     |
+| `criado_em`    | `Timestamp` | Data e hora de criação do registro do livro.    |
 
 ---
 
@@ -82,22 +86,24 @@ A API base está mapeada em `/livraria`. Abaixo estão os principais endpoints d
 ### Criar e Listar
 
 - `POST /livraria` - Adiciona um novo livro.
-- `GET /livraria` - Retorna todos os livros.
+- `GET /livraria` - Retorna os livros cadastrados de forma paginada.
+    - **Parâmetros opcionais de URL (Query Params):**
+        - `limit` (padrão: `10`): Define a quantidade máxima de registros retornados (ideal para controle de rolagem/scroll).
+        - `off` (padrão: `0`): Define o deslocamento (offset) inicial da busca na base de dados.
 
 ### Buscas
 
 - `GET /livraria/{id}` - Busca um livro pelo ID.
-- `GET /livraria/historico` - Retorna o histórico de livros (ordenado por data de criação).
-- `GET /livraria/filtro/{filtro}?valor={valor}` - Busca livros por título, autor, ISBN, preço ou ano de lançamento.
+- `GET /livraria/historico` - Retorna o histórico de criação dos livros com paginação e ordenação flexível.
+    - **Parâmetros opcionais de URL (Query Params):**
+        - `ordem` (padrão: `true`): Se `true`, ordena de forma decrescente (registros mais recentes primeiro); se `false`, ordena de forma crescente (mais antigos primeiro).
+        - `limit` (padrão: `5`): Quantidade de registros por página de histórico.
+        - `off` (padrão: `0`): Deslocamento inicial da paginação do histórico.
+- `GET /livraria/filtro/{filtro}?valor={valor}` - Busca livros por título, autor, ISBN, preço, ano de lançamento ou gênero.
 
 ### Atualizações Parciais
 
-- `PATCH /livraria/{id}/titulo?novoTitulo={novoTitulo}` - Atualiza o título.
-- `PATCH /livraria/{id}/autor?novoAutor={novoAutor}` - Atualiza o autor.
-- `PATCH /livraria/{id}/isbn?novaIsbn={novaIsbn}` - Atualiza o ISBN.
-- `PATCH /livraria/{id}/preco?novoPreco={novoPreco}` - Atualiza o preço.
-- `PATCH /livraria/{id}/estoque?novoEstoque={novoEstoque}` - Atualiza o estoque.
-- `PATCH /livraria/{id}/data?novaData={novaData}` - Atualiza a data de lançamento.
+- `PATCH /livraria/{id}/{tabela}?valor={novoValor}` - Atualiza a tabela escolhida.
 
 ### Remoção
 
@@ -139,7 +145,7 @@ A API base está mapeada em `/livraria`. Abaixo estão os principais endpoints d
    mvn spring-boot:run
    ```
 
-4. A API estará disponível em `http://localhost:8080/livraria/`.
+4. A API estará disponível em `http://localhost:8080/livraria`.
 
 ---
 
@@ -161,8 +167,7 @@ Como parte do aprendizado contínuo sobre infraestrutura moderna, o projeto est�
 ## 🔮 Próximos Passos (Roadmap)
 
 - [ ] Implementar Spring Data JPA para simplificar a camada de persistência.
-- [ ] Adicionar documentação interativa com Swagger/OpenAPI.
-- [ ] Adicionar paginação e ordenação nas listagens.
+- [x] Adicionar paginação e ordenação nas listagens.
 - [ ] Implementar segurança com Spring Security e JWT.
 - [ ] Aprofundar os estudos em Docker, Render e Neon para otimizar o deploy e a infraestrutura da aplicação.
 
