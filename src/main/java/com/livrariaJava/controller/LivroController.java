@@ -40,8 +40,13 @@ public class LivroController {
     }
 
     @GetMapping("/historico")
-    public ResponseEntity<?> historico(@RequestParam(value = "ordem", defaultValue = "true") boolean ordem, @RequestParam(value = "limit", defaultValue = "5") int limit, @RequestParam(value = "off", defaultValue = "0") int off) {
+    public ResponseEntity<?> historico(@RequestParam(value = "ordem", defaultValue = "true") boolean ordem, @RequestParam(value = "limit", defaultValue = "10") int limit, @RequestParam(value = "off", defaultValue = "0") int off) {
         return ResponseEntity.status(200).body(this.service.historicoLivro(ordem, limit, off));
+    }
+
+    @GetMapping("/generos")
+    public ResponseEntity<?> generos(@RequestParam(value = "limit", defaultValue = "10") int limit, @RequestParam(value = "off", defaultValue = "0") int off) {
+        return ResponseEntity.status(200).body(this.service.todosGeneros(limit, off));
     }
 
     @PatchMapping("/{id}/{tabela}")

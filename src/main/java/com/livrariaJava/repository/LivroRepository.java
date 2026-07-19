@@ -1,5 +1,6 @@
 package com.livrariaJava.repository;
 
+import com.livrariaJava.entity.Generos;
 import com.livrariaJava.entity.Livro;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -64,6 +65,16 @@ public class LivroRepository {
         this.conn.update(sql, map);
 
         return porId(id);
+    }
+
+    public List<Generos> todosGeneros(int limit, int off) {
+        String sql = "SELECT * FROM generos LIMIT :limit OFFSET :off";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("limit", limit);
+        map.put("off", off);
+
+        return this.conn.query(sql, map, new BeanPropertyRowMapper<>(Generos.class));
     }
 
     public List<Livro> historicoLivro(Boolean ordem, Integer limit, Integer off) {

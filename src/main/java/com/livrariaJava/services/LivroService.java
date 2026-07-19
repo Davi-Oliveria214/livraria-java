@@ -1,5 +1,6 @@
 package com.livrariaJava.services;
 
+import com.livrariaJava.entity.Generos;
 import com.livrariaJava.entity.Livro;
 import com.livrariaJava.entity.enums.GenerosEnum;
 import com.livrariaJava.exception.BuscaVazia;
@@ -94,6 +95,10 @@ public class LivroService implements LivroServiceInterface {
             case "genero" -> this.repository.atualizarLivro(id, tabela, validarGenero(novoValor));
             default -> this.repository.atualizarLivro(id, tabela, novoValor);
         };
+    }
+
+    public List<Generos> todosGeneros(int limit, int off) {
+        return this.repository.todosGeneros(limit, off);
     }
 
     private List<Livro> validarRetorno(List<Livro> livros) {
