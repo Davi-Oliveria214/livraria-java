@@ -73,12 +73,12 @@ public class LivroService implements LivroServiceInterface {
         this.isLivros();
 
         return switch (filtro) {
-            case "titulo" -> validarRetorno(this.repository.porTitulo(valor));
-            case "autor" -> validarRetorno(this.repository.porAutor(valor));
-            case "isbn" -> validarRetorno(this.repository.porIsbn(valor));
-            case "preco" -> validarRetorno(this.repository.porPreco(Double.parseDouble(valor)));
-            case "lancamento" -> validarRetorno(this.repository.porLancamento(anoInicioFim(valor)));
-            case "genero" -> validarRetorno(this.repository.porGeneros(validarGenero(valor)));
+            case "titulo" -> validarRetorno(this.repository.porTitulo(valor), filtro, valor);
+            case "autor" -> validarRetorno(this.repository.porAutor(valor), filtro, valor);
+            case "isbn" -> validarRetorno(this.repository.porIsbn(valor), filtro, valor);
+            case "preco" -> validarRetorno(this.repository.porPreco(Double.parseDouble(valor)), filtro, valor);
+            case "lancamento" -> validarRetorno(this.repository.porLancamento(anoInicioFim(valor)), filtro, valor);
+            case "genero" -> validarRetorno(this.repository.porGeneros(validarGenero(valor)), filtro, valor);
             default -> throw new BuscaVazia("Opção de busca inválida ou não existe: " + filtro);
         };
     }
@@ -101,9 +101,15 @@ public class LivroService implements LivroServiceInterface {
         return this.repository.todosGeneros(limit, off);
     }
 
-    private List<Livro> validarRetorno(List<Livro> livros) {
-        if (livros.isEmpty())
-            throw new BuscaVazia("Nanhum livro encontrado com");
+    private List<Livro> validarRetorno(List<Livro> livros, String filtro, String valor) {
+        if (filtro.equals("genero")) valor = GenerosEnum.paraString(valor);
+
+        if (livros.isEmpty()) {
+            filtro = filtro.substring(0, 1).toUpperCase() + filtro.substring(1);
+            if (valor != null) valor = valor.substring(0, 1).toUpperCase() + valor.substring(1);
+
+            throw new BuscaVazia("Nanhum livro encontrado com " + filtro + ": " + valor);
+        }
 
         return livros;
     }

@@ -25,8 +25,18 @@ public enum GenerosEnum {
     @JsonCreator
     public static GenerosEnum buscarGenero(String genero) {
         for (GenerosEnum g : GenerosEnum.values()) {
-            if (g.codigo.equalsIgnoreCase(genero) || g.name().equalsIgnoreCase(genero)) {
+            if (g.codigo.equalsIgnoreCase(genero) || g.name().equalsIgnoreCase(genero) || g.genero.equalsIgnoreCase(genero)) {
                 return g;
+            }
+        }
+
+        return null;
+    }
+
+    public static String paraString(String genero) {
+        for (GenerosEnum g : GenerosEnum.values()) {
+            if (g.codigo.equalsIgnoreCase(genero) || g.name().equalsIgnoreCase(genero) || g.genero.equalsIgnoreCase(genero)) {
+                return g.genero;
             }
         }
 
