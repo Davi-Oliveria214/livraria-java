@@ -167,6 +167,17 @@ public class LivroRepository {
         return this.conn.query(sql, map, mapearLivro()).isEmpty();
     }
 
+    public boolean autorAndTitulo(Long id, String autor, String titulo) {
+        String sql = "SELECT * FROM tb_livros WHERE autor = :autor AND titulo = :titulo AND id <> :id";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("autor", autor);
+        map.put("titulo", titulo);
+        map.put("id", id);
+
+        return this.conn.query(sql, map, mapearLivro()).isEmpty();
+    }
+
     public boolean isTabelaVazia() {
         String sql = "SELECT EXISTS (SELECT 1 FROM tb_livros)";
 

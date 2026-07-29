@@ -88,6 +88,20 @@ public class LivroService implements LivroServiceInterface {
         this.isLivros();
         this.buscarId(id);
 
+        if (tabela.equals("autor")) {
+            Livro livro = this.buscarId(id);
+
+            if (!this.repository.autorAndTitulo(id, novoValor, livro.getTitulo()))
+                throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + novoValor + ", já está cadastrado",
+                        HttpStatus.CONFLICT);
+        } else if (tabela.equals("titulo")) {
+            Livro livro = this.buscarId(id);
+
+            if (!this.repository.autorAndTitulo(id, livro.getAutor(), novoValor))
+                throw new LivroExcecao("Esse titulo: " + novoValor + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
+                        HttpStatus.CONFLICT);
+        }
+
         return switch (tabela) {
             case "lancamento" -> this.repository.atualizarLivro(id, tabela, LocalDate.parse(novoValor));
             case "preco" -> this.repository.atualizarLivro(id, tabela, Double.parseDouble(novoValor));
