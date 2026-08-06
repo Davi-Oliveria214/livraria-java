@@ -25,8 +25,8 @@ public class LivroController {
     }
 
     @GetMapping
-    public ResponseEntity<?> todosLivros(@RequestParam(value = "limit", defaultValue = "10") int limit, @RequestParam(value = "off", defaultValue = "0") int off) {
-        return ResponseEntity.ok(this.service.todosLivros(limit, off));
+    public ResponseEntity<?> todosLivros() {
+        return ResponseEntity.ok(this.service.todosLivros());
     }
 
     @GetMapping("/{id}")
@@ -40,17 +40,17 @@ public class LivroController {
     }
 
     @GetMapping("/historico")
-    public ResponseEntity<?> historico(@RequestParam(value = "ordem", defaultValue = "true") boolean ordem, @RequestParam(value = "limit", defaultValue = "10") int limit, @RequestParam(value = "off", defaultValue = "0") int off) {
-        return ResponseEntity.status(200).body(this.service.historicoLivro(ordem, limit, off));
+    public ResponseEntity<?> historico(@RequestParam(value = "ordem", defaultValue = "true") boolean ordem) {
+        return ResponseEntity.status(200).body(this.service.historicoLivro(ordem));
     }
 
     @GetMapping("/generos")
-    public ResponseEntity<?> generos(@RequestParam(value = "limit", defaultValue = "10") int limit, @RequestParam(value = "off", defaultValue = "0") int off) {
-        return ResponseEntity.status(200).body(this.service.todosGeneros(limit, off));
+    public ResponseEntity<?> generos() {
+        return ResponseEntity.status(200).body(this.service.todosGeneros());
     }
 
-    @PatchMapping("/{id}/{tabela}")
-    public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @PathVariable("tabela") String tabela, @RequestParam("valor") String valor) {
-        return ResponseEntity.status(200).body(this.service.atualizarLivro(id, tabela, valor));
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable("id") Long id, @RequestBody Livro livro) {
+        return ResponseEntity.status(200).body(this.service.atualizarLivro(id, livro));
     }
 }

@@ -2,14 +2,19 @@ package com.livrariaJava.services;
 
 import com.livrariaJava.entity.Generos;
 import com.livrariaJava.entity.Livro;
-import com.livrariaJava.entity.enums.GenerosEnum;
 import com.livrariaJava.exception.BuscaVazia;
 import com.livrariaJava.exception.LivroExcecao;
 import com.livrariaJava.interfaces.LivroServiceInterface;
+import com.livrariaJava.repository.GenerosRepository;
 import com.livrariaJava.repository.LivroRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.beans.PropertyDescriptor;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -19,6 +24,8 @@ import java.util.*;
 @Service
 public class LivroService implements LivroServiceInterface {
     private final LivroRepository repository;
+    @Autowired
+    private GenerosRepository generosRepository;
 
     public LivroService(LivroRepository livroRepository) {
         this.repository = livroRepository;
@@ -26,21 +33,21 @@ public class LivroService implements LivroServiceInterface {
 
     @Override
     public Livro cadastrarLivro(Livro livro) {
-        if (!this.repository.isIsbn(livro.getIsbn()))
+        if (!this.repository.findByIsbn(livro.getIsbn()).isEmpty())
             throw new LivroExcecao("Essa ISBN já está cadastrada", HttpStatus.CONFLICT);
 
-        if (!this.repository.autorAndTitulo(livro.getAutor(), livro.getTitulo()))
+        if (!this.repository.findByAutorAndTitulo(livro.getAutor(), livro.getTitulo()).isEmpty())
             throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
                     HttpStatus.CONFLICT);
 
-        return this.repository.cadastrarLivro(livro);
+        return this.repository.save(livro);
     }
 
     @Override
     public Object deletarLivro(Long id) {
         Livro livro = this.buscarId(id);
 
-        this.repository.deletarLivro(id);
+        this.repository.deleteById(id);
         Map<String, Object> map = new HashMap<>();
         map.put("status", HttpStatus.OK.value());
         map.put("message", livro.getTitulo() + " do autor " + livro.getAutor() + " deletado com sucesso");
@@ -48,98 +55,67 @@ public class LivroService implements LivroServiceInterface {
     }
 
     @Override
-    public List<Livro> todosLivros(int limit, int off) {
-        this.isLivros();
-
-        return this.repository.todosLivros(limit, off);
+    public List<Livro> todosLivros() {
+        return this.repository.findAll();
     }
 
     @Override
-    public List<Livro> historicoLivro(boolean ordem, int limit, int off) {
-        this.isLivros();
-
-        return this.repository.historicoLivro(ordem, limit, off);
+    public List<Livro> historicoLivro(boolean ordem) {
+        return ordem ? this.repository.findAllByOrderByCriadoDesc() : this.repository.findAllByOrderByCriadoAsc();
     }
 
     @Override
     public Livro buscarId(Long id) {
-        this.isLivros();
-
-        return Optional.ofNullable(this.repository.porId(id)).orElseThrow(() -> new BuscaVazia("Nenhum livro encontrado com o ID: " + id));
+        return this.repository.findById(id).orElseThrow(BuscaVazia::new);
     }
 
     @Override
     public List<Livro> filtroLivro(String filtro, String valor) {
-        this.isLivros();
-
         return switch (filtro) {
-            case "titulo" -> validarRetorno(this.repository.porTitulo(valor), filtro, valor);
-            case "autor" -> validarRetorno(this.repository.porAutor(valor), filtro, valor);
-            case "isbn" -> validarRetorno(this.repository.porIsbn(valor), filtro, valor);
-            case "preco" -> validarRetorno(this.repository.porPreco(Double.parseDouble(valor)), filtro, valor);
-            case "lancamento" -> validarRetorno(this.repository.porLancamento(anoInicioFim(valor)), filtro, valor);
-            case "genero" -> validarRetorno(this.repository.porGeneros(validarGenero(valor)), filtro, valor);
+            case "titulo" -> this.repository.findByTituloContainingIgnoreCase(valor);
+            case "autor" -> this.repository.findByAutorContainingIgnoreCase(valor);
+            case "isbn" -> this.repository.findByIsbn(valor);
+            case "preco" -> {
+                Double[] margem = margemDePreco(valor);
+                yield this.repository.findPreco(margem[0], margem[1]);
+            }
+            case "lancamento" -> {
+                List<LocalDate> data = anoInicioFim(valor);
+                yield this.repository.findLancamento(data.get(0), data.get(1));
+            }
+            case "genero" -> this.repository.findByGenero(valor);
             default -> throw new BuscaVazia("Opção de busca inválida ou não existe: " + filtro);
         };
     }
 
     @Override
-    public Livro atualizarLivro(Long id, String tabela, String novoValor) {
-        this.isLivros();
-        this.buscarId(id);
+    public Livro atualizarLivro(Long id, Livro novoValor) {
+        Livro livro = this.buscarId(id);
 
-        if (tabela.equals("autor")) {
-            Livro livro = this.buscarId(id);
+        if (novoValor.getAutor() != null && !this.repository.findByAutorAndTitulo(novoValor.getAutor(), livro.getTitulo()).isEmpty())
+            throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
+                    HttpStatus.CONFLICT);
 
-            if (!this.repository.autorAndTitulo(id, novoValor, livro.getTitulo()))
-                throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + novoValor + ", já está cadastrado",
-                        HttpStatus.CONFLICT);
-        } else if (tabela.equals("titulo")) {
-            Livro livro = this.buscarId(id);
+        if (novoValor.getTitulo() != null && !this.repository.findByAutorAndTitulo(livro.getAutor(), novoValor.getTitulo()).isEmpty())
+            throw new LivroExcecao("Esse titulo: " + livro.getTitulo() + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
+                    HttpStatus.CONFLICT);
 
-            if (!this.repository.autorAndTitulo(id, livro.getAutor(), novoValor))
-                throw new LivroExcecao("Esse titulo: " + novoValor + ", desse autor: " + livro.getAutor() + ", já está cadastrado",
-                        HttpStatus.CONFLICT);
-        }
-
-        return switch (tabela) {
-            case "lancamento" -> this.repository.atualizarLivro(id, tabela, LocalDate.parse(novoValor));
-            case "preco" -> this.repository.atualizarLivro(id, tabela, Double.parseDouble(novoValor));
-            case "estoque" -> this.repository.atualizarLivro(id, tabela, Integer.parseInt(novoValor));
-            case "genero" -> this.repository.atualizarLivro(id, tabela, validarGenero(novoValor));
-            default -> this.repository.atualizarLivro(id, tabela, novoValor);
-        };
+        BeanUtils.copyProperties(novoValor, livro, getCamposIgnorados(novoValor));
+        return this.repository.save(livro);
     }
 
-    public List<Generos> todosGeneros(int limit, int off) {
-        return this.repository.todosGeneros(limit, off);
+    public List<Generos> todosGeneros() {
+        return this.generosRepository.findAll();
     }
 
-    private List<Livro> validarRetorno(List<Livro> livros, String filtro, String valor) {
-        if (filtro.equals("genero")) valor = GenerosEnum.paraString(valor);
+    private Double[] margemDePreco(String valor) {
+        Double preco = Double.parseDouble(valor);
+        Double margem = (preco / 100) * 10;
 
-        if (livros.isEmpty()) {
-            filtro = filtro.substring(0, 1).toUpperCase() + filtro.substring(1);
-            if (valor != null) valor = valor.substring(0, 1).toUpperCase() + valor.substring(1);
+        double min = preco - margem;
+        double max = preco + margem;
 
-            throw new BuscaVazia("Nanhum livro encontrado com " + filtro + ": " + valor);
-        }
-
-        return livros;
-    }
-
-    private String validarGenero(String genero) {
-        GenerosEnum g = GenerosEnum.buscarGenero(genero);
-
-        if (g == null)
-            throw new BuscaVazia("Gênero de livro não disponível", HttpStatus.BAD_REQUEST);
-
-        return g.getCodigo();
-    }
-
-    private void isLivros() {
-        if (this.repository.isTabelaVazia())
-            throw new BuscaVazia("Nenhum livro cadastrado");
+        return new Double[]{min, max};
     }
 
     private List<LocalDate> anoInicioFim(String valor) {
@@ -154,5 +130,22 @@ public class LivroService implements LivroServiceInterface {
         datas.add(datas.get(0).withMonth(12).withDayOfMonth(31));
 
         return datas;
+    }
+
+    private String[] getCamposIgnorados(Object source) {
+        BeanWrapper src = new BeanWrapperImpl(source);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> camposIgnorados = new HashSet<>();
+        camposIgnorados.add("id");
+
+        for (PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) {
+                camposIgnorados.add(pd.getName());
+            }
+        }
+
+        return camposIgnorados.toArray(new String[0]);
     }
 }

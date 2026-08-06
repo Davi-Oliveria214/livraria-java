@@ -2,12 +2,18 @@ package com.livrariaJava.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.livrariaJava.entity.enums.GenerosEnum;
+import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
+@Table(name = "tb_livros")
+@Entity
 public class Livro {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String titulo;
     private String autor;
     private Double preco;
@@ -16,13 +22,15 @@ public class Livro {
     private String sinopse;
     private String genero;
     private LocalDate lancamento;
-    private Timestamp criado_em;
+
+    @Column(name = "criado_em")
+    private Timestamp criado;
 
     public Livro() {
 
     }
 
-    public Livro(Long id, String titulo, String autor, Double preco, String isbn, Integer estoque, String sinopse, String genero, LocalDate lancamento, Timestamp criado_em) {
+    public Livro(Long id, String titulo, String autor, Double preco, String isbn, Integer estoque, String sinopse, String genero, LocalDate lancamento) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
@@ -32,7 +40,7 @@ public class Livro {
         this.sinopse = sinopse;
         this.genero = genero;
         this.lancamento = lancamento;
-        this.criado_em = criado_em;
+        this.criado = new Timestamp(System.currentTimeMillis());
     }
 
     public Long getId() {
@@ -91,12 +99,14 @@ public class Livro {
         this.lancamento = lancamento;
     }
 
-    public Timestamp getCriado_em() {
-        return criado_em;
+    @JsonProperty(value = "criado_em")
+    public Timestamp getCriado() {
+        return criado;
     }
 
-    public void setCriado_em(Timestamp criado_em) {
-        this.criado_em = criado_em;
+    @JsonProperty(value = "criado_em", access = JsonProperty.Access.READ_ONLY)
+    public void setCriado(Timestamp criado_em) {
+        this.criado = criado_em;
     }
 
     public String getSinopse() {
@@ -121,18 +131,5 @@ public class Livro {
 
     public void setGenero(String genero) {
         this.genero = genero;
-    }
-
-    @Override
-    public String toString() {
-        return "Livro{" +
-                "ID: " + id +
-                ", Titulo: " + titulo +
-                ", Autor: " + autor +
-                ", Preço: " + preco +
-                ", ISBN: " + isbn +
-                ", Estoque: " + estoque +
-                ", Lançamento: " + lancamento +
-                "}";
     }
 }
