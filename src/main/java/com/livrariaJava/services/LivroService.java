@@ -14,10 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class LivroService implements LivroServiceInterface {
@@ -40,11 +37,14 @@ public class LivroService implements LivroServiceInterface {
     }
 
     @Override
-    public String deletarLivro(Long id) {
+    public Object deletarLivro(Long id) {
         Livro livro = this.buscarId(id);
 
         this.repository.deletarLivro(id);
-        return "Livro: " + livro.getTitulo() + " do autor " + livro.getAutor() + " deletado com sucesso";
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", HttpStatus.OK.value());
+        map.put("message", livro.getTitulo() + " do autor " + livro.getAutor() + " deletado com sucesso");
+        return map;
     }
 
     @Override

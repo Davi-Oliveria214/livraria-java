@@ -7,7 +7,7 @@ import java.util.List;
 public interface LivroServiceInterface {
     public Livro cadastrarLivro(Livro livro);
 
-    public String deletarLivro(Long id);
+    public Object deletarLivro(Long id);
 
     public List<Livro> todosLivros(int limit, int off);
 
